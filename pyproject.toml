@@ -7,12 +7,11 @@ requires-python = ">=3.12"
 dependencies = ["whoop", "eightsleep"]
 
 # uv workspace: one lockfile at the root. Members are an EXPLICIT list of
-# Python projects — do NOT use a bare `projects/*` glob, since projects/ may
-# also hold non-Python work (TS) with no pyproject.toml, which makes uv refuse
-# to resolve. Add a Python project's path here when you create it.
+# Python projects. Do NOT add a bare `projects/*` glob — projects/ may also hold
+# TS-only work with no pyproject.toml, which makes uv refuse to resolve. Add a
+# Python project's path here when you create it.
 [tool.uv.workspace]
-members = ["lib/py/*"]
-exclude = ["projects/*"]
+members = ["lib/py/*", "projects/dashboard"]
 
 [tool.uv]
 # Keep the root virtualenv at .venv (activated by .envrc).

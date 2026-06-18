@@ -77,6 +77,10 @@ class Night:
     def to_dict(self) -> dict:
         return asdict(self)
 
+    @classmethod
+    def from_dict(cls, d: dict) -> Night:
+        return cls(**{k: d.get(k) for k in cls.__dataclass_fields__})
+
 
 class EightSleepClient:
     def __init__(self, *, email: str, password: str, timezone: str) -> None:

@@ -1,0 +1,11 @@
+[project]
+name = "dashboard"
+version = "0.1.0"
+description = "Fused WHOOP + Eight Sleep dashboard — the instrument panel neither app gives you."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["whoop", "eightsleep", "flask>=3.0"]
+
+[tool.uv.sources]
+whoop = { workspace = true }
+eightsleep = { workspace = true }
