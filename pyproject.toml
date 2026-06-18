@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "tetraslam messes with his WHOOP here — data pulls, dashboards, whatever."
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["whoop"]
+dependencies = ["whoop", "eightsleep"]
 
 # uv workspace: one lockfile at the root. Members are an EXPLICIT list of
 # Python projects — do NOT use a bare `projects/*` glob, since projects/ may
@@ -20,10 +20,13 @@ package = false
 
 [tool.uv.sources]
 whoop = { workspace = true }
+eightsleep = { workspace = true }
 
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+# Vendored third-party source (Eight Sleep's OAuth2 client) — don't lint it.
+extend-exclude = ["lib/py/eightsleep/eightsleep/pyeight"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
