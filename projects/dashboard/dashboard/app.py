@@ -21,6 +21,7 @@ from .fusion import (
     build_nights,
     comeback_report,
     driver_report,
+    readiness_report,
     today_report,
     trust_report,
 )
@@ -59,6 +60,7 @@ def summary():
             "comeback": comeback_report(nights),
             "drivers": driver_report(nights),
             "today": today_report(nights),
+            "readiness": readiness_report(nights),
         }
     )
 

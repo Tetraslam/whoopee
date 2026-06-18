@@ -3,499 +3,379 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>whoopee — fused</title>
+<title>whoopee</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0d11;
-    --bg-2: #11161c;
-    --panel: #0f141a;
-    --panel-2: #131a21;
-    --line: #232c37;
-    --line-2: #313c49;
-    /* text scale — high contrast, four legible steps */
-    --ink: #f0f3f6;       /* primary numbers / values */
-    --ink-2: #c3ccd6;     /* body text */
-    --dim: #94a1ad;       /* labels, units (readable) */
-    --faint: #6b7682;     /* tertiary captions */
-    --green: #1fe096;
-    --green-dim: #15a06d;
-    --blue: #6ea0ff;
-    --amber: #f0bb44;
-    --red: #ff6f54;
+    /* warm near-black, not blue-black */
+    --bg: #14110f;
+    --bg-soft: #1b1714;
+    --card: #1c1815;
+    --edge: #2a241f;
+    --edge-soft: #221d19;
+    /* warm neutral text ramp */
+    --ink: #f4efe8;
+    --ink-2: #cfc6ba;
+    --muted: #9a9085;
+    --faint: #6d655c;
+    /* semantic — only these carry meaning */
+    --good: #5fc88a;
+    --mid: #e0b15e;
+    --low: #e8745a;
+    --cool: #7ba7d0;   /* whoop / secondary series */
     --sans: "Inter", -apple-system, system-ui, sans-serif;
-    --mono: "JetBrains Mono", ui-monospace, monospace;
+    --serif: "Fraunces", Georgia, serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); color: var(--ink-2); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
-  body::before {
-    content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
-    opacity: 0.022; mix-blend-mode: screen;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  .wrap { max-width: 1200px; margin: 0 auto; padding: 30px 24px 90px; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink-2); font-family: var(--sans); -webkit-font-smoothing: antialiased; line-height: 1.5; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 40px 28px 48px; }
+  a { color: inherit; }
 
-  /* header */
-  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
-  .brand { font-family: var(--mono); font-size: 13px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--ink); font-weight: 500; }
-  .brand .x { color: var(--green); margin: 0 3px; }
-  .brand .tag { color: var(--dim); }
-  .hdr-r { display: flex; align-items: center; gap: 16px; font-family: var(--mono); font-size: 11px; color: var(--dim); letter-spacing: 0.04em; }
-  .live { display: inline-flex; align-items: center; gap: 6px; color: var(--faint); }
-  .live .pip { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-  .hdr-r button { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); background: transparent; border: 1px solid var(--line-2); border-radius: 2px; padding: 6px 12px; cursor: pointer; transition: all .15s; }
-  .hdr-r button:hover { color: var(--green); border-color: var(--green); }
+  header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 44px; }
+  .wordmark { font-family: var(--serif); font-size: 21px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+  .wordmark span { color: var(--muted); font-weight: 400; }
+  .meta { font-family: var(--mono); font-size: 11.5px; color: var(--faint); display: flex; gap: 16px; align-items: center; }
+  .meta .live { display: inline-flex; gap: 6px; align-items: center; }
+  .meta .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--good); animation: pulse 2.4s infinite; }
+  @keyframes pulse { 0%,100%{opacity:.9} 50%{opacity:.2} }
+  .meta button { font: inherit; color: var(--muted); background: none; border: none; cursor: pointer; padding: 0; border-bottom: 1px solid var(--edge); }
+  .meta button:hover { color: var(--ink); }
 
-  /* section heading — a real hierarchy anchor */
-  .label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); display: flex; justify-content: space-between; align-items: baseline; padding-left: 9px; border-left: 2px solid var(--green); }
-  .label .hint { color: var(--faint); letter-spacing: 0.03em; text-transform: none; font-size: 11px; border: none; }
-  .sub { font-size: 13px; color: var(--ink-2); line-height: 1.6; margin-top: 10px; }
-  .sub b { color: var(--ink); font-weight: 600; }
-  .sub .muted { color: var(--faint); }
+  /* ---- HERO: how am I, and why ---- */
+  .hero { display: grid; grid-template-columns: 280px 1fr; gap: 48px; align-items: center; margin-bottom: 16px; }
+  .dial { position: relative; width: 280px; height: 280px; }
+  .dial canvas { width: 280px; height: 280px; }
+  .dial .center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 6px; }
+  .dial .score { font-family: var(--serif); font-size: 72px; font-weight: 500; line-height: 1; letter-spacing: -0.02em; }
+  .dial .scoremax { font-family: var(--mono); font-size: 12px; color: var(--faint); margin-top: 2px; }
+  .dial .word { font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; margin-top: 10px; }
 
-  /* today strip */
-  .today { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 2px; margin-bottom: 16px; overflow: hidden; }
-  .cell { background: var(--panel); padding: 13px 14px 14px; }
-  .cell .ck { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
-  .cell .cv { font-size: 27px; font-weight: 600; margin-top: 8px; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; color: var(--ink); line-height: 1; }
-  .cell .cu { font-family: var(--mono); font-size: 10px; color: var(--faint); margin-left: 4px; font-weight: 400; }
-  .cell .cz { font-family: var(--mono); font-size: 11px; margin-top: 6px; letter-spacing: 0.01em; }
-  .z-hi { color: var(--green); } .z-lo { color: var(--red); } .z-mid { color: var(--faint); }
+  .why .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .why h1 { font-family: var(--serif); font-size: 28px; font-weight: 500; color: var(--ink); margin: 0 0 22px; line-height: 1.25; letter-spacing: -0.01em; }
+  .why h1 em { font-style: normal; }
+  /* component meters: each signal vs your own range */
+  .signals { display: flex; flex-direction: column; gap: 14px; }
+  .sig { display: grid; grid-template-columns: 110px 1fr 70px; align-items: center; gap: 14px; }
+  .sig .name { font-size: 13.5px; color: var(--ink-2); }
+  .sig .meter { position: relative; height: 6px; background: var(--bg-soft); border-radius: 3px; }
+  .sig .meter .base { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--edge); }
+  .sig .meter .dot { position: absolute; top: 50%; width: 9px; height: 9px; border-radius: 50%; transform: translate(-50%,-50%); transition: left .6s cubic-bezier(.2,.8,.2,1); }
+  .sig .val { text-align: right; font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+  .sig .val .u { color: var(--faint); font-size: 10.5px; }
 
-  /* grid */
-  .grid { display: grid; gap: 14px; grid-template-columns: repeat(12, 1fr); }
-  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 2px; padding: 18px 20px; }
-  .col-3 { grid-column: span 3; } .col-4 { grid-column: span 4; } .col-5 { grid-column: span 5; }
-  .col-6 { grid-column: span 6; } .col-7 { grid-column: span 7; } .col-8 { grid-column: span 8; } .col-12 { grid-column: span 12; }
-  @media (max-width: 900px) { [class^="col-"] { grid-column: span 12; } .today { grid-auto-flow: row; grid-template-columns: repeat(2,1fr); grid-auto-columns: unset; } }
+  /* ---- section rhythm ---- */
+  section { margin-top: 56px; }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; }
+  .sec-head h2 { font-family: var(--serif); font-size: 19px; font-weight: 500; color: var(--ink); margin: 0; letter-spacing: -0.01em; }
+  .sec-head .note { font-size: 12.5px; color: var(--faint); }
 
-  /* hero number block — number + unit caption stacked, unmistakable */
-  .hero { margin-top: 16px; }
-  .hero .n { font-size: 60px; font-weight: 700; line-height: 0.9; color: var(--green); font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
-  .hero .u { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); margin-top: 9px; }
+  .card { background: var(--card); border: 1px solid var(--edge-soft); border-radius: 10px; padding: 22px 24px; }
 
-  /* agreement bars */
-  .bars { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
-  .bar-row { display: grid; grid-template-columns: 92px 1fr 42px; align-items: center; gap: 12px; }
-  .bar-row .k { font-family: var(--mono); font-size: 11px; color: var(--dim); letter-spacing: 0.04em; text-transform: uppercase; }
-  .track { height: 4px; background: var(--bg-2); border-radius: 2px; overflow: hidden; }
-  .fill { height: 100%; width: 0; background: var(--green); transition: width .6s cubic-bezier(.2,.8,.2,1); }
-  .bar-row .v { text-align: right; font-family: var(--mono); font-size: 13px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  /* trend */
+  canvas.chart { display: block; width: 100%; cursor: crosshair; }
+  .chart-legend { display: flex; gap: 20px; font-size: 12px; color: var(--muted); margin-top: 14px; align-items: center; }
+  .chart-legend .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; margin-right: 7px; vertical-align: middle; }
+  .chart-legend .right { margin-left: auto; color: var(--faint); font-family: var(--mono); font-size: 11px; }
+
+  /* comeback band */
+  .band { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
+  .band .col .lab { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .band .col .pair { display: flex; align-items: baseline; gap: 10px; }
+  .band .col .then { font-family: var(--mono); font-size: 15px; color: var(--faint); }
+  .band .col .now { font-family: var(--serif); font-size: 30px; font-weight: 500; color: var(--ink); }
+  .band .col .now .u { font-family: var(--mono); font-size: 12px; color: var(--faint); font-weight: 400; }
+  .arrow.up { color: var(--good); } .arrow.down { color: var(--low); } .arrow.flat { color: var(--muted); }
+  .band-note { font-size: 13px; color: var(--muted); margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--edge-soft); }
+  .band-note b { color: var(--ink-2); font-weight: 600; }
 
   /* drivers */
-  .drivers { margin-top: 16px; display: flex; flex-direction: column; gap: 3px; }
-  .drv { display: grid; grid-template-columns: 132px 1fr 46px; align-items: center; gap: 10px; padding: 5px 0; }
-  .drv .dk { font-size: 13px; color: var(--ink-2); }
-  .drv .dbar { height: 16px; position: relative; background: var(--bg-2); border-radius: 2px; }
-  .drv .dbar .mid { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--line-2); }
-  .drv .dseg { position: absolute; top: 3px; bottom: 3px; border-radius: 1px; transition: width .5s ease; }
-  .drv .dseg.pos { left: 50%; background: var(--green); }
-  .drv .dseg.neg { right: 50%; background: var(--red); }
-  .drv .dv { text-align: right; font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
-  .drv .dv.pos { color: var(--green); } .drv .dv.neg { color: var(--red); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
+  @media (max-width: 720px){ .two,.hero,.band { grid-template-columns: 1fr; } .dial{margin:0 auto} }
+  .drv { display: grid; grid-template-columns: 130px 1fr 46px; align-items: center; gap: 12px; padding: 7px 0; }
+  .drv .dk { font-size: 13.5px; color: var(--ink-2); }
+  .drv .db { position: relative; height: 8px; background: var(--bg-soft); border-radius: 4px; }
+  .drv .db .mid { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--edge); }
+  .drv .seg { position: absolute; top: 1px; bottom: 1px; border-radius: 3px; transition: width .5s ease; }
+  .drv .dv { text-align: right; font-family: var(--mono); font-size: 12.5px; }
 
-  /* delta items */
-  .delta { display: flex; gap: 30px; flex-wrap: wrap; margin-top: 18px; }
-  .delta .dk { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
-  .delta .dv { font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 7px; letter-spacing: -0.02em; color: var(--ink); }
-  .delta .dv .arr { font-size: 16px; }
-  .delta .was { font-family: var(--mono); font-size: 11px; color: var(--faint); margin-top: 4px; }
-  .thennow { display: flex; align-items: baseline; gap: 8px; margin-top: 7px; }
-  .thennow .then { font-family: var(--mono); font-size: 15px; color: var(--faint); font-variant-numeric: tabular-nums; }
-  .thennow .ar { font-size: 15px; }
-  .thennow .dv { font-size: 30px; margin-top: 0; }
-  .thennow .u2 { font-family: var(--mono); font-size: 11px; color: var(--faint); }
-  .up { color: var(--green) !important; } .down { color: var(--red) !important; } .flat { color: var(--dim) !important; }
+  /* trust — demoted to a quiet footnote-style line */
+  .trust { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  .trust .big { font-family: var(--serif); font-size: 24px; color: var(--ink); font-weight: 500; }
+  .trust .chip { font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
+  .trust .chip b { color: var(--faint); font-weight: 400; }
 
-  /* chart */
-  canvas { display: block; width: 100%; cursor: crosshair; }
-  .legend { display: flex; gap: 18px; font-family: var(--mono); font-size: 11px; color: var(--dim); margin-top: 12px; align-items: center; }
-  .legend .dot { display: inline-block; width: 9px; height: 9px; margin-right: 7px; vertical-align: middle; border-radius: 2px; }
-  .legend .muted { color: var(--faint); margin-left: auto; letter-spacing: 0.02em; }
-  .tip { position: fixed; pointer-events: none; background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 2px; padding: 9px 11px; font-family: var(--mono); font-size: 11px; color: var(--ink); z-index: 100; opacity: 0; transition: opacity .1s; white-space: nowrap; box-shadow: 0 8px 28px rgba(0,0,0,.6); }
-  .tip .tr { display: flex; justify-content: space-between; gap: 18px; margin-top: 3px; }
-  .tip .td { color: var(--dim); }
+  /* log */
+  details.log { border-top: 1px solid var(--edge-soft); }
+  details.log summary { list-style: none; cursor: pointer; padding: 16px 0 4px; display: flex; justify-content: space-between; align-items: baseline; }
+  details.log summary::-webkit-details-marker { display: none; }
+  details.log summary .h { font-family: var(--serif); font-size: 19px; color: var(--ink); }
+  details.log summary .c { font-size: 12.5px; color: var(--faint); }
+  .scroll { max-height: 420px; overflow-y: auto; margin-top: 12px; }
+  .scroll::-webkit-scrollbar { width: 8px; } .scroll::-webkit-scrollbar-thumb { background: var(--edge); border-radius: 4px; }
+  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; }
+  th,td { text-align: right; padding: 7px 10px; white-space: nowrap; border-bottom: 1px solid var(--edge-soft); }
+  th { position: sticky; top: 0; background: var(--bg); color: var(--faint); font-weight: 400; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; }
+  td { color: var(--ink-2); } td:first-child, th:first-child { text-align: left; color: var(--muted); }
+  .cool { color: var(--cool); } .warm { color: var(--good); }
+  tbody tr:hover td { background: var(--bg-soft); }
 
-  /* table */
-  .scroll { max-height: 380px; overflow-y: auto; margin-top: 14px; }
-  .scroll::-webkit-scrollbar { width: 9px; } .scroll::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 0; } .scroll::-webkit-scrollbar-track { background: var(--bg-2); }
-  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
-  th, td { text-align: right; padding: 7px 10px; white-space: nowrap; border-bottom: 1px solid var(--bg-2); }
-  th { color: var(--dim); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; font-size: 10px; position: sticky; top: 0; background: var(--panel); border-bottom: 1px solid var(--line); }
-  td { color: var(--ink-2); }
-  tbody tr:hover td { background: var(--bg-2); }
-  td:first-child, th:first-child { text-align: left; color: var(--dim); }
-  .w { color: var(--blue); } .e { color: var(--green); }
-  .tag { font-size: 9px; border: 1px solid var(--line-2); padding: 1px 5px; letter-spacing: 0.06em; border-radius: 2px; color: var(--dim); }
-  .loading { font-family: var(--mono); color: var(--dim); font-size: 13px; letter-spacing: 0.1em; padding: 50px 0; }
-  /* subtle flash when a value changes on poll */
-  @keyframes vchg { from { color: var(--green); } to {} }
-  .changed { animation: vchg 1.2s ease-out; }
+  .tip { position: fixed; pointer-events: none; background: var(--bg-soft); border: 1px solid var(--edge); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--ink); z-index: 100; opacity: 0; transition: opacity .12s; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+  .tip .d { font-family: var(--mono); color: var(--muted); margin-bottom: 5px; }
+  .tip .r { display: flex; justify-content: space-between; gap: 20px; font-family: var(--mono); }
+  .tip .r span:first-child { color: var(--muted); }
+  .loading { color: var(--faint); padding: 80px 0; text-align: center; font-family: var(--mono); }
+  .changed { animation: fl 1.1s ease-out; } @keyframes fl { from { color: var(--good); } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="brand">whoop<span class="x">×</span>eight sleep <span class="tag">· fused</span></div>
-    <div class="hdr-r">
-      <span class="live"><span class="pip"></span>live · 10s</span>
+    <div class="wordmark">whoopee <span>· sleep & recovery</span></div>
+    <div class="meta">
+      <span class="live"><span class="pip"></span>live</span>
       <span id="stamp">—</span>
-      <button id="refresh">re-pull</button>
+      <button id="refresh">refresh</button>
     </div>
   </header>
-  <div id="root"><div class="loading">acquiring signal…</div></div>
+  <div id="root"><div class="loading">reading last night…</div></div>
 </div>
 <div class="tip" id="tip"></div>
 
 <script>
-const $ = (s,p=document)=>p.querySelector(s);
+const $=(s,p=document)=>p.querySelector(s);
 const fmt=(v,d=1)=>v==null?"—":(+v).toFixed(d);
-const tip = $("#tip");
-let built = false;     // skeleton built?
-let lastVals = {};     // for change-flash
+const tip=$("#tip");
+let built=false, lastVals={};
+function setv(id,val){const el=document.getElementById(id);if(!el)return;const s=String(val);if(el.textContent!==s){el.textContent=s;if(built&&lastVals[id]!==undefined&&lastVals[id]!==s){el.classList.remove("changed");void el.offsetWidth;el.classList.add("changed");}lastVals[id]=s;}}
+const bandColor=b=>b==="high"?"var(--good)":b==="low"?"var(--low)":"var(--mid)";
+const bandWord=b=>b==="high"?"primed":b==="low"?"run down":"steady";
 
-// ---- value setter: writes text into a stable node, flashes on change -------
-function setv(id, val){
-  const el = document.getElementById(id);
-  if(!el) return;
-  const s = String(val);
-  if(el.textContent !== s){
-    el.textContent = s;
-    if(built && lastVals[id]!==undefined && lastVals[id]!==s){
-      el.classList.remove("changed"); void el.offsetWidth; el.classList.add("changed");
-    }
-    lastVals[id]=s;
-  }
-}
-function setw(id, pct){ const el=document.getElementById(id); if(el) el.style.width=pct+"%"; }
+async function getData(refresh){const r=await fetch("/api/summary"+(refresh?"?refresh=1":""));return r.json();}
+async function boot(){const d=await getData(false);build(d);built=true;update(d);setInterval(async()=>{try{update(await getData(false));}catch(e){}},10000);}
 
-async function fetchData(refresh=false){
-  const r = await fetch("/api/summary"+(refresh?"?refresh=1":""));
-  return r.json();
-}
-
-async function boot(){
-  const data = await fetchData(false);
-  buildSkeleton(data);
-  built = true;
-  update(data);
-  // poll every 10s, update in place
-  setInterval(async ()=>{ try{ update(await fetchData(false)); }catch(e){} }, 10000);
-}
-
-// ============ SKELETON (built once) =========================================
-function buildSkeleton(data){
-  const {nights, drivers, today} = data;
-  const todayKeys = today&&today.metrics ? Object.entries({
-    sleep_score:["score",""], hrv:["hrv",""], resting_hr:["rest hr","bpm"],
-    respiratory:["resp","rpm"], sleep_hours:["sleep","h"], deep_pct:["deep","%"], rem_pct:["rem","%"]
-  }).filter(([k])=>today.metrics[k]&&today.metrics[k].latest!=null) : [];
-
-  $("#root").innerHTML = `
-    <div class="today">
-      ${todayKeys.map(([k,[lbl,unit]])=>`
-        <div class="cell">
-          <div class="ck">${lbl}</div>
-          <div class="cv"><span id="t_${k}">—</span><span class="cu">${unit}</span></div>
-          <div class="cz" id="tz_${k}">—</div>
-        </div>`).join("")}
+function build(d){
+  const rd=d.readiness||{};
+  $("#root").innerHTML=`
+    <div class="hero">
+      <div class="dial">
+        <canvas id="dial" width="280" height="280"></canvas>
+        <div class="center">
+          <div class="score" id="rd_score" style="color:${bandColor(rd.band)}">—</div>
+          <div class="scoremax">readiness · vs your norm</div>
+          <div class="word" id="rd_word" style="color:${bandColor(rd.band)}">—</div>
+        </div>
+      </div>
+      <div class="why">
+        <div class="eyebrow" id="rd_date">last night</div>
+        <h1 id="rd_head">—</h1>
+        <div class="signals" id="signals"></div>
+      </div>
     </div>
 
-    <div class="grid">
-      <div class="panel col-5">
-        <div class="label"><span>device agreement</span><span class="hint">whoop hrv ↔ eight sleep hrv</span></div>
-        <canvas id="scatter" height="200"></canvas>
-        <div class="bars">
-          ${["hrv","resting_hr","respiratory"].map(k=>`
-            <div class="bar-row"><span class="k">${k.replace("_"," ")}</span><span class="track"><span class="fill" id="bar_${k}"></span></span><span class="v" id="barv_${k}">—</span></div>`).join("")}
+    <section>
+      <div class="sec-head"><h2>Recovery, week over week</h2><span class="note" id="trend_note">HRV, both sensors</span></div>
+      <div class="card">
+        <canvas id="trend" class="chart" height="220"></canvas>
+        <div class="chart-legend">
+          <span><span class="sw" style="background:var(--good)"></span>Eight Sleep HRV</span>
+          <span><span class="sw" style="background:var(--cool)"></span>WHOOP HRV</span>
+          <span class="right">hover any night</span>
         </div>
       </div>
+    </section>
 
-      <div class="panel col-7">
-        <div class="label"><span>the comeback</span><span class="hint" id="gap_hint">—</span></div>
-        <div class="delta">
-          ${[["sleep score","ss",""],["hrv","hv",""],["resting hr","rh","bpm"]].map(([lbl,id,u])=>`
-            <div>
-              <div class="dk">${lbl}</div>
-              <div class="thennow"><span class="then" id="cbf_${id}">—</span><span class="ar" id="cba_${id}">→</span><span class="dv" id="cb_${id}">—</span><span class="u2">${u}</span></div>
+    <section id="comeback_sec">
+      <div class="sec-head"><h2>Back on the wrist</h2><span class="note" id="cb_note">—</span></div>
+      <div class="card">
+        <div class="band">
+          ${[["sleep score","ss",""],["HRV","hv",""],["resting HR","rh","bpm"]].map(([l,id,u])=>`
+            <div class="col"><div class="lab">${l}</div>
+              <div class="pair"><span class="then" id="cbf_${id}">—</span><span class="arrow" id="cba_${id}">→</span><span class="now"><span id="cbn_${id}">—</span> <span class="u">${u}</span></span></div>
             </div>`).join("")}
         </div>
-        <canvas id="cbChart" height="120"></canvas>
+        <div class="band-note" id="cb_band_note">—</div>
       </div>
+    </section>
 
-      <div class="panel col-7">
-        <div class="label"><span>what drives your sleep score</span><span class="hint" id="drv_n">—</span></div>
-        <div class="drivers" id="drv_sleep">${driverSkeleton(5)}</div>
+    <section>
+      <div class="sec-head"><h2>What actually moves your numbers</h2><span class="note" id="drv_note">—</span></div>
+      <div class="card two">
+        <div><div style="font-size:12.5px;color:var(--muted);margin-bottom:12px">→ sleep score</div><div id="drv_sleep"></div></div>
+        <div><div style="font-size:12.5px;color:var(--muted);margin-bottom:12px">→ HRV</div><div id="drv_hrv"></div></div>
       </div>
+    </section>
 
-      <div class="panel col-5">
-        <div class="label"><span>what drives your hrv</span><span class="hint">pearson r · all nights</span></div>
-        <div class="drivers" id="drv_hrv">${driverSkeleton(4)}</div>
-      </div>
+    <section>
+      <div class="sec-head"><h2>Two sensors, checked against each other</h2></div>
+      <div class="card trust" id="trust">—</div>
+    </section>
 
-      <div class="panel col-8">
-        <div class="label"><span>hrv trend</span><span class="hint">whoop rmssd vs eight sleep · z-scored</span></div>
-        <canvas id="hrvChart" height="230"></canvas>
-        <div class="legend">
-          <span><span class="dot" style="background:var(--blue)"></span>WHOOP</span>
-          <span><span class="dot" style="background:var(--green)"></span>Eight Sleep</span>
-          <span class="muted">hover any night</span>
-        </div>
-      </div>
-
-      <div class="panel col-4">
-        <div class="label"><span>coverage</span></div>
-        <div style="display:flex;gap:26px;margin:16px 0 6px">
-          <div><div class="n" style="font-size:34px;font-weight:700;color:var(--blue);line-height:1" id="cov_w">—</div><div class="u" style="margin-top:7px">WHOOP nights</div></div>
-          <div><div class="n" style="font-size:34px;font-weight:700;color:var(--green);line-height:1" id="cov_e">—</div><div class="u" style="margin-top:7px">eight sleep nights</div></div>
-        </div>
-        <canvas id="scoreChart" height="92"></canvas>
-      </div>
-
-      <div class="panel col-12">
-        <div class="label"><span>nightly log</span><span class="hint" id="log_n">—</span></div>
-        <div class="scroll"><table>
-          <thead><tr>
-            <th>night</th><th>rec</th><th>strain</th><th class="w">W hrv</th><th class="w">W rhr</th><th class="w">deep</th>
-            <th class="e">E score</th><th class="e">E hrv</th><th class="e">E hr</th><th class="e">deep</th><th class="e">rem</th><th class="e">sleep</th><th>src</th>
-          </tr></thead>
+    <section>
+      <details class="log">
+        <summary><span class="h">Every night</span><span class="c" id="log_c">—</span></summary>
+        <div class="scroll"><table>          <thead><tr><th>night</th><th>readiness</th><th class="cool">W·rec</th><th class="cool">W·hrv</th><th class="warm">E·score</th><th class="warm">E·hrv</th><th class="warm">E·hr</th><th class="warm">deep</th><th class="warm">rem</th><th class="warm">sleep</th></tr></thead>
           <tbody id="log_body"></tbody>
         </table></div>
-      </div>
-    </div>`;
-
-  $("#refresh").addEventListener("click", async ()=>{
-    $("#refresh").textContent="pulling…";
-    update(await fetchData(true));
-    $("#refresh").textContent="re-pull";
-  });
-}
-function driverSkeleton(n){
-  let s="";for(let i=0;i<n;i++) s+=`<div class="drv" id="drvrow_${i}" style="display:none"><span class="dk"></span><span class="dbar"><span class="mid"></span><span class="dseg"></span></span><span class="dv"></span></div>`;
-  return s;
+      </details>
+    </section>`;
+  $("#refresh").addEventListener("click",async()=>{$("#refresh").textContent="…";update(await getData(true));$("#refresh").textContent="refresh";});
 }
 
-// ============ UPDATE (in place, no reflow) ==================================
-function update(data){
-  const {nights, trust, comeback, drivers, today} = data;
-  setv("stamp", new Date(data.pulled_at*1000).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}));
+function update(d){
+  const {nights,trust,comeback,drivers,readiness:rd}=d;
+  setv("stamp",new Date(d.pulled_at*1000).toLocaleString([], {weekday:'short',hour:'2-digit',minute:'2-digit'}));
 
-  // today strip
-  if(today&&today.metrics){
-    const dmap={sleep_score:0,hrv:1,resting_hr:0,respiratory:1,sleep_hours:1,deep_pct:0,rem_pct:0};
-    for(const [k,m] of Object.entries(today.metrics)){
-      if(document.getElementById("t_"+k)){
-        setv("t_"+k, fmt(m.latest, dmap[k]??1));
-        const zel=document.getElementById("tz_"+k);
-        if(zel){
-          const z=m.z; let cls="z-mid", arrow="·", txt="baseline";
-          if(z!=null&&Math.abs(z)>=0.5){const good=m.higher_good?z>0:z<0;cls=good?"z-hi":"z-lo";arrow=z>0?"▲":"▼";txt=`${z>0?"+":""}${z}σ`;}
-          else if(z!=null){txt=`${z>0?"+":""}${z}σ`;}
-          zel.className="cz "+cls; zel.textContent=`${arrow} ${txt} vs 30d`;
-        }
-      }
-    }
+  // hero
+  if(rd&&rd.score!=null){
+    setv("rd_score",rd.score);
+    const w=bandWord(rd.band); const wel=$("#rd_word"); wel.textContent=w; wel.style.color=bandColor(rd.band);
+    $("#rd_score").style.color=bandColor(rd.band);
+    setv("rd_date",niceDate(rd.date));
+    $("#rd_head").innerHTML=headline(rd);
+    drawDial(rd.score,rd.band);
+    renderSignals(rd.components);
   }
 
-  // agreement — the scatter shows the correlation; bars quantify per metric
-  for(const k of ["hrv","resting_hr","respiratory"]){
-    const c=trust.correlations[k];
-    setw("bar_"+k, c==null?0:Math.round(Math.abs(c)*100));
-    setv("barv_"+k, c==null?"—":c.toFixed(2));
-  }
-  drawScatter(nights);
+  // trend
+  drawTrend(nights);
 
-  // comeback — then → now, shown
-  const c=comeback, base=c.baseline_eightsleep_avg, rec=c.recent7_eightsleep_avg;
-  if(c.gap){
-    const h=document.getElementById("gap_hint");
-    h.innerHTML = `worn through ${c.gap.last_worn_before} · <span style="color:var(--amber)">${c.gap.days}d dark</span>`;
-  }
-  setThenNow("ss", base.sleep_score, rec.sleep_score, 0, true);
-  setThenNow("hv", base.hrv, rec.hrv, 1, true);
-  setThenNow("rh", base.hr, rec.hr, 1, false);
-  drawComeback(nights);
+  // comeback
+  const c=comeback,b=c.baseline_eightsleep_avg,n=c.recent7_eightsleep_avg;
+  if(c.gap) setv("cb_note",`${c.gap.days} days off · resumed around now`);
+  thenNow("ss",b.sleep_score,n.sleep_score,0,true);
+  thenNow("hv",b.hrv,n.hrv,1,true);
+  thenNow("rh",b.hr,n.hr,1,false);
+  $("#cb_band_note").innerHTML = c.gap
+    ? `Eight Sleep logged all <b>${c.eightsleep_only_nights}</b> nights you were off WHOOP — that's how we know the “then.”`
+    : "Both devices active.";
 
-  // drivers — ranked bars say it; no sentence
-  setv("drv_n", `pearson r · ${drivers.n} nights`);
-  fillDrivers("drv_sleep", drivers.sleep_score_drivers, 5);
-  fillDrivers("drv_hrv", drivers.hrv_drivers, 4);
+  // drivers
+  setv("drv_note",`Pearson r across ${drivers.n} nights`);
+  fillDrivers("drv_sleep",drivers.sleep_score_drivers,5);
+  fillDrivers("drv_hrv",drivers.hrv_drivers,4);
 
-  // coverage
-  setv("cov_w", c.whoop_active_nights);
-  setv("cov_e", c.eightsleep_only_nights);
+  // trust
+  const ag=trust.overall_agreement;
+  $("#trust").innerHTML=`<span class="big">${ag==null?"—":(ag).toFixed(2)}</span><span>mean agreement over ${trust.overlapping_nights} shared nights</span>`
+    + ["hrv","resting_hr","respiratory"].map(k=>`<span class="chip"><b>${k.replace("_"," ")}</b> ${trust.correlations[k]==null?"—":trust.correlations[k].toFixed(2)}</span>`).join("");
 
   // log
-  setv("log_n", `${nights.length} nights`);
-  const body=$("#log_body");
-  const html=nights.slice().reverse().map(rowHtml).join("");
-  if(body.innerHTML!==html) body.innerHTML=html;
-
-  drawHrv(nights);
-  drawScore(nights);
+  setv("log_c",`${nights.length} nights`);
+  const body=$("#log_body");const html=nights.slice().reverse().map(rowHtml).join("");if(body.innerHTML!==html)body.innerHTML=html;
 }
 
-function setThenNow(id, from, to, d, higherGood){
-  const fEl=document.getElementById("cbf_"+id), aEl=document.getElementById("cba_"+id), nEl=document.getElementById("cb_"+id);
-  if(!nEl)return;
-  fEl.textContent = from==null?"—":(+from).toFixed(d);
-  nEl.textContent = to==null?"—":(+to).toFixed(d);
-  if(from==null||to==null){nEl.className="dv flat";aEl.textContent="→";aEl.className="ar flat";return;}
-  const diff=to-from, eps=d===0?0.5:0.05, flat=Math.abs(diff)<eps, up=diff>0, good=higherGood?up:!up;
-  const cls=flat?"flat":good?"up":"down";
-  nEl.className="dv "+cls; aEl.className="ar "+cls;
-  aEl.textContent=flat?"→":up?"↗":"↘";
+function niceDate(s){if(!s)return"last night";const dt=new Date(s+"T12:00");return dt.toLocaleDateString([], {weekday:'long',month:'long',day:'numeric'});}
+function headline(rd){
+  const dr=rd.driver; const w=bandWord(rd.band);
+  if(!dr) return `You're <em style="color:${bandColor(rd.band)}">${w}</em>.`;
+  const dirWord = dr.z>=0 ? "above" : "below";
+  const col = (dr.z>=0)===(dr.key!=="es_hr") ? "var(--good)" : "var(--low)";
+  return `You're <em style="color:${bandColor(rd.band)}">${w}</em> — mostly because <em style="color:${col}">${dr.label.toLowerCase()}</em> came in ${Math.abs(dr.z).toFixed(1)}σ ${dirWord} your usual.`;
 }
 
-function fillDrivers(containerId, list, max){
-  const cont=document.getElementById(containerId);
-  for(let i=0;i<max;i++){
-    const row=document.getElementById((containerId==="drv_sleep"?"drvrow_":"hdrvrow_")+i);
-  }
-  // re-render rows into the existing container nodes
-  const rows=cont.children;
-  for(let i=0;i<max;i++){
-    let row=rows[i];
-    const d=list[i];
-    if(!row){ continue; }
-    if(!d){ row.style.display="none"; continue; }
-    row.style.display="grid";
-    row.querySelector(".dk").textContent=d.label;
-    const seg=row.querySelector(".dseg");
-    const pos=d.r>=0, mag=Math.min(100,Math.abs(d.r)*140)/2;
-    seg.className="dseg "+(pos?"pos":"neg");
-    seg.style.width=mag+"%";
-    seg.style.left=pos?"50%":"auto"; seg.style.right=pos?"auto":"50%";
-    const dv=row.querySelector(".dv");
-    dv.className="dv "+(pos?"pos":"neg");
-    dv.textContent=(pos?"+":"")+d.r.toFixed(2);
-  }
-}
-function driverNarr(ds, outcome){
-  if(!ds||!ds.length) return "";
-  const t=ds[0], dir=t.r>=0?"more":"less";
-  return `<b>${t.label}</b> is your strongest lever — ${dir} of it tracks higher ${outcome} <span class="muted">(r ${t.r>=0?"+":""}${t.r.toFixed(2)})</span>.`;
+function renderSignals(comps){
+  const cont=$("#signals");
+  const units={es_hrv:"",es_hr:" bpm",es_deep_pct:"%",es_rem_pct:"%",es_sleep_hours:" h"};
+  cont.innerHTML=comps.map(c=>{
+    const pos=Math.max(4,Math.min(96, 50 + c.z*22));
+    const good=c.score>=50;
+    const col=good?"var(--good)":c.score<38?"var(--low)":"var(--mid)";
+    const d=c.key==="es_sleep_hours"?1:c.key==="es_hrv"?1:0;
+    return `<div class="sig">
+      <span class="name">${c.label}</span>
+      <span class="meter"><span class="base"></span><span class="dot" style="left:${pos}%;background:${col}"></span></span>
+      <span class="val">${fmt(c.value,d)}<span class="u">${units[c.key]||""}</span></span>
+    </div>`;
+  }).join("");
 }
 
-// scatter: WHOOP HRV vs Eight Sleep HRV on overlap nights — correlation, shown
-function drawScatter(nights){
-  const cv=$("#scatter");if(!cv)return;const dpr=devicePixelRatio||1,W=cv.clientWidth,H=200;
-  cv.width=W*dpr;cv.height=H*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
-  const pts=nights.filter(n=>n.whoop_hrv_ms!=null&&n.es_hrv!=null).map(n=>[n.es_hrv,n.whoop_hrv_ms]);
-  const pad={l:34,r:10,t:10,b:24};const iW=W-pad.l-pad.r,iH=H-pad.t-pad.b;
-  ctx.clearRect(0,0,W,H);
-  if(pts.length<2){ctx.fillStyle="#6b7682";ctx.font="11px 'JetBrains Mono'";ctx.fillText("not enough overlap yet",pad.l,H/2);return;}
-  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
-  const xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys);
-  const px=v=>pad.l+iW*(v-xmin)/((xmax-xmin)||1), py=v=>pad.t+iH*(1-(v-ymin)/((ymax-ymin)||1));
-  // axes
-  ctx.strokeStyle="#232c37";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,pad.t+iH);ctx.lineTo(pad.l+iW,pad.t+iH);ctx.stroke();
-  ctx.fillStyle="#6b7682";ctx.font="9px 'JetBrains Mono'";
-  ctx.fillText("ES",pad.l+iW-14,pad.t+iH+16);ctx.save();ctx.translate(10,pad.t+14);ctx.rotate(-Math.PI/2);ctx.fillText("WHOOP",0,0);ctx.restore();
-  // regression line
-  const n=pts.length,mx=xs.reduce((a,b)=>a+b)/n,my=ys.reduce((a,b)=>a+b)/n;
-  let num=0,den=0;for(let i=0;i<n;i++){num+=(xs[i]-mx)*(ys[i]-my);den+=(xs[i]-mx)**2;}
-  const slope=den?num/den:0,inter=my-slope*mx;
-  ctx.strokeStyle="rgba(110,160,255,0.5)";ctx.lineWidth=1.4;ctx.setLineDash([4,4]);ctx.beginPath();
-  ctx.moveTo(px(xmin),py(slope*xmin+inter));ctx.lineTo(px(xmax),py(slope*xmax+inter));ctx.stroke();ctx.setLineDash([]);
-  // points
-  pts.forEach(p=>{ctx.fillStyle="rgba(31,224,150,0.85)";ctx.beginPath();ctx.arc(px(p[0]),py(p[1]),3,0,7);ctx.fill();});
-  // r value, big, in corner
-  ctx.fillStyle="#1fe096";ctx.font="600 22px Inter,sans-serif";ctx.fillText("r "+(num/Math.sqrt(den*ys.reduce((a,b)=>a+(b-my)**2,0))).toFixed(2),pad.l+8,pad.t+22);
-  ctx.fillStyle="#94a1ad";ctx.font="10px 'JetBrains Mono'";ctx.fillText(pts.length+" overlap nights",pad.l+8,pad.t+38);
+function thenNow(id,from,to,d,higherGood){
+  const f=document.getElementById("cbf_"+id),a=document.getElementById("cba_"+id),nn=document.getElementById("cbn_"+id);
+  if(!nn)return; f.textContent=from==null?"—":(+from).toFixed(d); nn.textContent=to==null?"—":(+to).toFixed(d);
+  if(from==null||to==null){a.textContent="→";a.className="arrow flat";return;}
+  const diff=to-from,eps=d===0?0.5:0.05,flat=Math.abs(diff)<eps,up=diff>0,good=higherGood?up:!up;
+  a.textContent=flat?"→":up?"↗":"↘"; a.className="arrow "+(flat?"flat":good?"up":"down");
 }
 
-// comeback: the gap made visceral — score line with the dark window shaded amber
-function drawComeback(nights){
-  const cv=$("#cbChart");if(!cv)return;const dpr=devicePixelRatio||1,W=cv.clientWidth,H=120;
-  cv.width=W*dpr;cv.height=H*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
-  const pad={l:4,r:4,t:10,b:4},iW=W-pad.l-pad.r,iH=H-pad.t-pad.b;
-  const X=i=>pad.l+iW*i/Math.max(1,nights.length-1),Y=v=>pad.t+iH*(1-(v-40)/60);
-  ctx.clearRect(0,0,W,H);
-  // WHOOP era (had recovery) in blue; the dark stretch after, amber wash
-  const wIdx=nights.map((n,i)=>n.whoop_recovery!=null?i:null).filter(i=>i!=null);
-  if(wIdx.length){
-    const lastW=Math.max(...wIdx);
-    ctx.fillStyle="rgba(110,160,255,0.10)";ctx.fillRect(X(Math.min(...wIdx)),pad.t,Math.max(2,X(lastW)-X(Math.min(...wIdx))),iH);
-    ctx.fillStyle="rgba(240,187,68,0.07)";ctx.fillRect(X(lastW),pad.t,X(nights.length-1)-X(lastW),iH);
-    ctx.fillStyle="#6ea0ff";ctx.font="9px 'JetBrains Mono'";ctx.fillText("worn",X(Math.min(...wIdx))+3,pad.t+9);
-    ctx.fillStyle="#f0bb44";ctx.fillText("dark",X(lastW)+3,pad.t+9);
-  }
-  ctx.beginPath();let st=false;nights.forEach((n,i)=>{if(n.es_score==null)return;const p=[X(i),Y(n.es_score)];if(!st){ctx.moveTo(...p);st=true;}else ctx.lineTo(...p);});
-  ctx.strokeStyle="#1fe096";ctx.lineWidth=1.3;ctx.stroke();
+function fillDrivers(id,list,max){
+  const cont=document.getElementById(id);
+  cont.innerHTML=list.slice(0,max).map(dd=>{
+    const pos=dd.r>=0,mag=Math.min(100,Math.abs(dd.r)*150)/2;
+    const col=pos?"var(--good)":"var(--low)";
+    return `<div class="drv"><span class="dk">${dd.label}</span><span class="db"><span class="mid"></span><span class="seg" style="${pos?'left:50%':'right:50%'};width:${mag}%;background:${col}"></span></span><span class="dv" style="color:${col}">${pos?"+":""}${dd.r.toFixed(2)}</span></div>`;
+  }).join("");
 }
 
 function rowHtml(n){
-  const tag=n.sources.map(s=>s==="whoop"?`<span class="tag w">W</span>`:`<span class="tag e">E</span>`).join(" ");
-  return `<tr>
-    <td>${n.date}</td>
+  return `<tr><td>${n.date}</td>
     <td>${n.whoop_recovery==null?"—":Math.round(n.whoop_recovery)}</td>
-    <td>${fmt(n.whoop_strain,1)}</td>
-    <td class="w">${fmt(n.whoop_hrv_ms,0)}</td>
-    <td class="w">${fmt(n.whoop_rhr,0)}</td>
-    <td class="w">${fmt(n.whoop_deep_pct,0)}</td>
-    <td class="e">${n.es_score==null?"—":n.es_score}</td>
-    <td class="e">${fmt(n.es_hrv,1)}</td>
-    <td class="e">${fmt(n.es_hr,0)}</td>
-    <td class="e">${fmt(n.es_deep_pct,0)}</td>
-    <td class="e">${fmt(n.es_rem_pct,0)}</td>
-    <td class="e">${fmt(n.es_sleep_hours,1)}</td>
-    <td>${tag}</td></tr>`;
+    <td class="cool">${n.whoop_recovery==null?"—":Math.round(n.whoop_recovery)}</td>
+    <td class="cool">${fmt(n.whoop_hrv_ms,0)}</td>
+    <td class="warm">${n.es_score==null?"—":n.es_score}</td>
+    <td class="warm">${fmt(n.es_hrv,1)}</td>
+    <td class="warm">${fmt(n.es_hr,0)}</td>
+    <td class="warm">${fmt(n.es_deep_pct,0)}</td>
+    <td class="warm">${fmt(n.es_rem_pct,0)}</td>
+    <td class="warm">${fmt(n.es_sleep_hours,1)}</td></tr>`;
 }
 
-// ============ charts ========================================================
-function zscore(a){const v=a.filter(x=>x!=null);if(v.length<2)return a.map(()=>null);const mu=v.reduce((x,y)=>x+y,0)/v.length;const sd=Math.sqrt(v.reduce((x,y)=>x+(y-mu)**2,0)/v.length)||1;return a.map(x=>x==null?null:(x-mu)/sd);}
-
-let hrvState=null;
-function drawHrv(nights){
-  const cv=$("#hrvChart");if(!cv)return;
-  const dpr=devicePixelRatio||1, W=cv.clientWidth, H=230;
-  cv.width=W*dpr;cv.height=H*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
-  const w=zscore(nights.map(n=>n.whoop_hrv_ms)), e=zscore(nights.map(n=>n.es_hrv));
-  const pad={l:28,r:14,t:14,b:18}, iW=W-pad.l-pad.r, iH=H-pad.t-pad.b;
-  const all=[...w,...e].filter(x=>x!=null), min=Math.min(-2.4,...all), max=Math.max(2.4,...all);
-  const X=i=>pad.l+iW*i/Math.max(1,nights.length-1), Y=v=>pad.t+iH*(1-(v-min)/(max-min));
-  hrvState={nights,w,e,X,Y,pad,W,H,iH};
-  paintHrv(-1);
+/* ---------- dial ---------- */
+function drawDial(score,band){
+  const cv=$("#dial");if(!cv)return;const dpr=devicePixelRatio||1;cv.width=280*dpr;cv.height=280*dpr;
+  const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+  const cx=140,cy=140,r=110,a0=Math.PI*0.75,a1=Math.PI*2.25;
+  ctx.clearRect(0,0,280,280);
+  ctx.lineCap="round";
+  ctx.strokeStyle="#2a241f";ctx.lineWidth=10;ctx.beginPath();ctx.arc(cx,cy,r,a0,a1);ctx.stroke();
+  const col=band==="high"?"#5fc88a":band==="low"?"#e8745a":"#e0b15e";
+  const a=a0+(a1-a0)*Math.max(0,Math.min(100,score))/100;
+  ctx.strokeStyle=col;ctx.lineWidth=10;ctx.beginPath();ctx.arc(cx,cy,r,a0,a);ctx.stroke();
+  // tick at 50 (your baseline)
+  const at=a0+(a1-a0)*0.5;ctx.strokeStyle="#6d655c";ctx.lineWidth=2;ctx.beginPath();
+  ctx.moveTo(cx+Math.cos(at)*(r-9),cy+Math.sin(at)*(r-9));ctx.lineTo(cx+Math.cos(at)*(r+9),cy+Math.sin(at)*(r+9));ctx.stroke();
 }
-function paintHrv(hover){
-  const s=hrvState;if(!s)return;const ctx=$("#hrvChart").getContext("2d");
-  ctx.clearRect(0,0,s.W,s.H);
-  ctx.font="10px 'JetBrains Mono',monospace";
+
+/* ---------- trend ---------- */
+function zs(a){const v=a.filter(x=>x!=null);if(v.length<2)return a.map(()=>null);const m=v.reduce((x,y)=>x+y)/v.length;const sd=Math.sqrt(v.reduce((x,y)=>x+(y-m)**2,0)/v.length)||1;return a.map(x=>x==null?null:(x-m)/sd);}
+let TR=null;
+function drawTrend(nights){
+  const cv=$("#trend");if(!cv)return;const dpr=devicePixelRatio||1,W=cv.clientWidth,H=220;cv.width=W*dpr;cv.height=H*dpr;
+  const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+  const e=zs(nights.map(n=>n.es_hrv)),w=zs(nights.map(n=>n.whoop_hrv_ms));
+  const pad={l:14,r:14,t:16,b:20},iW=W-pad.l-pad.r,iH=H-pad.t-pad.b;
+  const all=[...e,...w].filter(x=>x!=null),min=Math.min(-2.2,...all),max=Math.max(2.2,...all);
+  const X=i=>pad.l+iW*i/Math.max(1,nights.length-1),Y=v=>pad.t+iH*(1-(v-min)/(max-min));
+  TR={nights,e,w,X,Y,pad,W,H,iH};
+  paintTrend(-1);
+}
+function paintTrend(hover){
+  const s=TR;if(!s)return;const ctx=$("#trend").getContext("2d");ctx.clearRect(0,0,s.W,s.H);
+  // baseline at 0
+  ctx.strokeStyle="#2a241f";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(s.pad.l,s.Y(0));ctx.lineTo(s.W-s.pad.r,s.Y(0));ctx.stroke();
   const ov=s.nights.map((n,i)=>(n.whoop_hrv_ms!=null&&n.es_hrv!=null)?i:null).filter(i=>i!=null);
-  if(ov.length){const x0=s.X(Math.min(...ov)),x1=s.X(Math.max(...ov));ctx.fillStyle="rgba(110,160,255,0.08)";ctx.fillRect(x0,s.pad.t,Math.max(2,x1-x0),s.iH);ctx.fillStyle="#5a6b80";ctx.fillText("overlap",x0+4,s.pad.t+11);}
-  for(let g=-2;g<=2;g++){const yy=s.Y(g);ctx.strokeStyle="#232c37";ctx.globalAlpha=g===0?1:0.5;ctx.beginPath();ctx.moveTo(s.pad.l,yy);ctx.lineTo(s.W-s.pad.r,yy);ctx.stroke();ctx.globalAlpha=1;ctx.fillStyle="#6b7682";ctx.fillText((g>0?"+":"")+g,5,yy+3);}
-  const line=(vals,color)=>{ctx.strokeStyle=color;ctx.lineWidth=1.7;ctx.beginPath();let st=false;vals.forEach((v,i)=>{if(v==null){st=false;return;}const px=s.X(i),py=s.Y(v);if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);});ctx.stroke();};
-  line(s.e,"#1fe096");line(s.w,"#6ea0ff");
-  if(hover>=0){const px=s.X(hover);ctx.strokeStyle="#3a4654";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(px,s.pad.t);ctx.lineTo(px,s.pad.t+s.iH);ctx.stroke();[["#6ea0ff",s.w],["#1fe096",s.e]].forEach(([c,v])=>{if(v[hover]!=null){ctx.fillStyle=c;ctx.beginPath();ctx.arc(px,s.Y(v[hover]),3.2,0,7);ctx.fill();}});}
+  if(ov.length){const x0=s.X(Math.min(...ov)),x1=s.X(Math.max(...ov));ctx.fillStyle="rgba(123,167,208,0.07)";ctx.fillRect(x0,s.pad.t,Math.max(2,x1-x0),s.iH);}
+  const smooth=(vals,color,wd)=>{ctx.strokeStyle=color;ctx.lineWidth=wd;ctx.beginPath();let st=false;vals.forEach((v,i)=>{if(v==null){st=false;return;}const px=s.X(i),py=s.Y(v);if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);});ctx.stroke();};
+  smooth(s.w,"#7ba7d0",1.5);smooth(s.e,"#5fc88a",2);
+  if(hover>=0){const px=s.X(hover);ctx.strokeStyle="#4a423a";ctx.beginPath();ctx.moveTo(px,s.pad.t);ctx.lineTo(px,s.pad.t+s.iH);ctx.stroke();
+    [["#7ba7d0",s.w],["#5fc88a",s.e]].forEach(([c,v])=>{if(v[hover]!=null){ctx.fillStyle=c;ctx.beginPath();ctx.arc(px,s.Y(v[hover]),3.4,0,7);ctx.fill();}});}
 }
-function hrvHover(ev){
-  const s=hrvState;if(!s)return;const rect=$("#hrvChart").getBoundingClientRect();
-  const x=ev.clientX-rect.left;const i=Math.round((x-s.pad.l)/((s.W-s.pad.l-s.pad.r)/Math.max(1,s.nights.length-1)));
-  if(i<0||i>=s.nights.length){tip.style.opacity=0;paintHrv(-1);return;}
-  const n=s.nights[i];paintHrv(i);
-  tip.innerHTML=`<div style="color:var(--ink);font-weight:500">${n.date}</div>
-    <div class="tr"><span class="td">WHOOP hrv</span><span class="w">${fmt(n.whoop_hrv_ms,0)} ms</span></div>
-    <div class="tr"><span class="td">ES hrv</span><span class="e">${fmt(n.es_hrv,1)}</span></div>
-    <div class="tr"><span class="td">rec / score</span><span>${n.whoop_recovery==null?"—":Math.round(n.whoop_recovery)} / ${n.es_score??"—"}</span></div>`;
-  tip.style.left=(ev.clientX+14)+"px";tip.style.top=(ev.clientY+14)+"px";tip.style.opacity=1;
+function trendHover(ev){
+  const s=TR;if(!s)return;const rect=$("#trend").getBoundingClientRect();const x=ev.clientX-rect.left;
+  const i=Math.round((x-s.pad.l)/((s.W-s.pad.l-s.pad.r)/Math.max(1,s.nights.length-1)));
+  if(i<0||i>=s.nights.length){tip.style.opacity=0;paintTrend(-1);return;}
+  const n=s.nights[i];paintTrend(i);
+  tip.innerHTML=`<div class="d">${niceDate(n.date)}</div>
+    <div class="r"><span>Eight Sleep HRV</span><span style="color:var(--good)">${fmt(n.es_hrv,1)}</span></div>
+    <div class="r"><span>WHOOP HRV</span><span style="color:var(--cool)">${fmt(n.whoop_hrv_ms,0)} ms</span></div>
+    <div class="r"><span>sleep score</span><span>${n.es_score??"—"}</span></div>`;
+  tip.style.left=(ev.clientX+16)+"px";tip.style.top=(ev.clientY+16)+"px";tip.style.opacity=1;
 }
-document.addEventListener("mousemove",e=>{if(e.target&&e.target.id==="hrvChart")hrvHover(e);else if(tip.style.opacity!=="0"){tip.style.opacity=0;paintHrv(-1);}});
-
-function drawScore(nights){
-  const cv=$("#scoreChart");if(!cv)return;const dpr=devicePixelRatio||1,W=cv.clientWidth,H=92;
-  cv.width=W*dpr;cv.height=H*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
-  const pad={l:4,r:4,t:8,b:4},iW=W-pad.l-pad.r,iH=H-pad.t-pad.b;
-  const X=i=>pad.l+iW*i/Math.max(1,nights.length-1),Y=v=>pad.t+iH*(1-(v-40)/60);
-  const wIdx=nights.map((n,i)=>n.whoop_recovery!=null?i:null).filter(i=>i!=null);
-  if(wIdx.length){ctx.fillStyle="rgba(110,160,255,0.10)";const x0=X(Math.min(...wIdx)),x1=X(Math.max(...wIdx));ctx.fillRect(x0,pad.t,Math.max(2,x1-x0),iH);ctx.fillStyle="#6ea0ff";ctx.font="9px 'JetBrains Mono'";ctx.fillText("WHOOP era",x0+3,pad.t+9);}
-  ctx.beginPath();let st=false;nights.forEach((n,i)=>{if(n.es_score==null)return;const px=X(i),py=Y(n.es_score);if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);});ctx.strokeStyle="#1fe096";ctx.lineWidth=1.4;ctx.stroke();
-}
-
-addEventListener("resize",()=>{if(hrvState&&window.__lastData)drawHrv(window.__lastData.nights);});
+document.addEventListener("mousemove",e=>{if(e.target&&e.target.id==="trend")trendHover(e);else if(tip.style.opacity!=="0"){tip.style.opacity=0;paintTrend(-1);}});
+addEventListener("resize",()=>{if(window.__d)drawTrend(window.__d.nights);});
+const _u=update;update=function(d){window.__d=d;_u(d);};
 boot();
 </script>
 </body>

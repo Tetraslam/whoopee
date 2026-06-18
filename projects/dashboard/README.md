@@ -7,20 +7,17 @@ strap, Eight Sleep mattress) measuring the same sleep, lined up night by night.
 
 ## What it shows
 
-- **Today vs baseline** — a strip of the latest night's metrics, each flagged
-  with a σ score against your own 30-day window: instantly see what's unusual.
-- **Device agreement** — how well WHOOP and Eight Sleep agree on HRV, resting
-  HR, and respiratory rate over the nights you wore both. Trend correlation
-  across independent hardware. The cross-validation no single app can do.
-- **The comeback** — Eight Sleep logs every night with zero effort, so it covers
-  any WHOOP gap. Compares your metrics from when you last wore WHOOP vs now.
-- **What drives your sleep / HRV** — ranks every input (sleep duration, deep %,
-  REM %, tossing, respiratory) by how strongly it correlates with your sleep
-  score and HRV, signed, across all recorded nights. Your actual levers.
-- **HRV trend** — WHOOP RMSSD and Eight Sleep HRV, z-scored so two different
-  scales overlay; the overlap window is shaded. Hover any night for detail.
-- **Coverage** — sleep score over time, WHOOP-active era marked; never breaks.
-- **Nightly log** — every night, both sources, including strain and stage %.
+A calm morning read, top to bottom in order of what matters:
+
+- **Readiness** — one 0–100 number for last night, scored against *your own*
+  30-day baseline (50 = typical for you), with a plain-language headline naming
+  the biggest factor and component meters showing where each vital fell vs your
+  norm. Built from HRV, resting HR, deep/REM %, and sleep duration.
+- **Recovery, week over week** — HRV from both sensors, z-scored; hover any night.
+- **Back on the wrist** — then → now across the WHOOP gap (Eight Sleep covered it).
+- **What moves your numbers** — drivers ranked by correlation with sleep score / HRV.
+- **Two sensors checked against each other** — quiet cross-device agreement line.
+- **Every night** — the full log (collapsed).
 
 ## Run it
 

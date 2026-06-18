@@ -386,3 +386,73 @@ def today_report(nights: list[FusedNight]) -> dict:
             "sleep_debt": metric("es_sleep_debt", higher_good=False),
         },
     }
+
+
+# --- readiness: one honest "how am I" number from last night ------------------
+
+# The signals that compose readiness, with direction. Each is z-scored against
+# your own 30-day window, sign-corrected so "better for you" is positive, then
+# mapped to 0-100. This is YOUR baseline, not a population — 50 means "typical
+# for you," higher means a better-than-usual morning.
+_READINESS_SIGNALS = [
+    ("es_hrv", "HRV", True, 0.30),
+    ("es_hr", "resting HR", False, 0.25),
+    ("es_deep_pct", "deep sleep", True, 0.18),
+    ("es_rem_pct", "REM sleep", True, 0.15),
+    ("es_sleep_hours", "sleep duration", True, 0.12),
+]
+
+
+def readiness_report(nights: list[FusedNight]) -> dict:
+    """A single 0-100 readiness for the latest night, plus its components.
+
+    Built from the directional z-scores of your sleep vitals against your own
+    30-day baseline. Returned with each contributing signal so the UI can show
+    *why* the number is what it is — not just assert it.
+    """
+    have = [n for n in nights if n.es_score is not None]
+    if len(have) < 5:
+        return {}
+    latest = have[-1]
+    window = have[-30:]
+
+    components = []
+    weighted_sum = 0.0
+    weight_total = 0.0
+    for attr, label, higher_good, weight in _READINESS_SIGNALS:
+        latest_v = getattr(latest, attr)
+        vals = [getattr(n, attr) for n in window if getattr(n, attr) is not None]
+        if latest_v is None or len(vals) < 3:
+            continue
+        mu = statistics.mean(vals)
+        sd = statistics.pstdev(vals) or 1.0
+        z = (latest_v - mu) / sd
+        if not higher_good:
+            z = -z
+        # map z in [-2, 2] -> [0, 100], clamp
+        contrib = max(0.0, min(100.0, 50 + z * 22))
+        components.append(
+            {
+                "key": attr,
+                "label": label,
+                "value": latest_v,
+                "z": round(z, 2),
+                "score": round(contrib),
+            }
+        )
+        weighted_sum += contrib * weight
+        weight_total += weight
+
+    if weight_total == 0:
+        return {}
+    score = round(weighted_sum / weight_total)
+    band = "high" if score >= 60 else "low" if score < 40 else "mid"
+    # the single biggest swing factor (largest |z|) for a one-glance "why"
+    components_by_swing = sorted(components, key=lambda c: abs(c["z"]), reverse=True)
+    return {
+        "date": latest.date,
+        "score": score,
+        "band": band,
+        "components": components,
+        "driver": components_by_swing[0] if components_by_swing else None,
+    }
