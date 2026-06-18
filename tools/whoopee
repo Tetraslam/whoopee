@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# whoopee — start/stop the fused WHOOP × Eight Sleep dashboard from anywhere.
+#
+#   whoopee up        start it (and open the browser)
+#   whoopee down      stop it
+#   whoopee status    is it running?
+#   whoopee logs      tail the log
+#   whoopee restart   stop + start
+#   whoopee open      just open the browser
+#
+# Thin wrapper over tools/serve.sh so it works no matter your current directory.
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SERVE="$REPO_ROOT/tools/serve.sh"
+URL="http://127.0.0.1:8787"
+
+open_url() {
+  if command -v xdg-open >/dev/null 2>&1; then xdg-open "$URL" >/dev/null 2>&1 &
+  elif command -v open >/dev/null 2>&1; then open "$URL" >/dev/null 2>&1 &
+  fi
+}
+
+case "${1:-up}" in
+  up|start)
+    "$SERVE" start dashboard
+    echo "→ $URL"
+    open_url
+    ;;
+  down|stop)   "$SERVE" stop dashboard ;;
+  restart)     "$SERVE" restart dashboard; echo "→ $URL" ;;
+  status)      "$SERVE" status dashboard ;;
+  logs)        "$SERVE" logs dashboard ;;
+  open)        open_url; echo "→ $URL" ;;
+  *) echo "usage: whoopee {up|down|restart|status|logs|open}"; exit 2 ;;
+esac
