@@ -1,0 +1,33 @@
+[project]
+name = "whoopee"
+version = "0.1.0"
+description = "tetraslam messes with his WHOOP here — data pulls, dashboards, whatever."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["whoop"]
+
+# uv workspace: one lockfile at the root. Members are an EXPLICIT list of
+# Python projects — do NOT use a bare `projects/*` glob, since projects/ may
+# also hold non-Python work (TS) with no pyproject.toml, which makes uv refuse
+# to resolve. Add a Python project's path here when you create it.
+[tool.uv.workspace]
+members = ["lib/py/*"]
+exclude = ["projects/*"]
+
+[tool.uv]
+# Keep the root virtualenv at .venv (activated by .envrc).
+package = false
+
+[tool.uv.sources]
+whoop = { workspace = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"

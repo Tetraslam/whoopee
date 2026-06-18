@@ -1,0 +1,7 @@
+# One JS workspace for the whole repo — a single lockfile at the root, mirroring
+# uv.lock for Python. Members are an explicit allowlist of globs. Add a TS/JS
+# project by creating a dir with package.json under one of these paths.
+packages:
+  - "projects/*"
+  - "lib/ts/*"
+  - "tools/*"

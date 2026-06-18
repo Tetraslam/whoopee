@@ -1,0 +1,34 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# Node / pnpm
+node_modules/
+.pnpm-store/
+dist/
+*.tsbuildinfo
+
+# Env / secrets — NEVER commit resolved secrets.
+# .env.op files (op:// references only) ARE committed; resolved .env are not.
+.env
+.env.local
+.env.*.local
+!.env.op
+!*.env.op
+
+# WHOOP OAuth tokens (resolved access/refresh tokens — never commit)
+.whoop-token.json
+*.whoop-token.json
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+
+# Scratch outputs
+/scratch/
+*.tmp
