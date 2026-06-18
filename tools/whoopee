@@ -21,11 +21,24 @@ open_url() {
   fi
 }
 
+# Wait until the server actually answers before opening the browser, so the
+# page isn't loaded against a not-yet-ready port. Gives up after ~30s.
+wait_ready() {
+  printf "waiting for dashboard"
+  for _ in $(seq 1 60); do
+    if curl -s -o /dev/null -m 2 "$URL" 2>/dev/null; then
+      printf " ready\n"; return 0
+    fi
+    printf "."; sleep 0.5
+  done
+  printf " (timed out — try: whoopee logs)\n"; return 1
+}
+
 case "${1:-up}" in
   up|start)
     "$SERVE" start dashboard
+    wait_ready && open_url
     echo "→ $URL"
-    open_url
     ;;
   down|stop)   "$SERVE" stop dashboard ;;
   restart)     "$SERVE" restart dashboard; echo "→ $URL" ;;
