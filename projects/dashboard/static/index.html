@@ -3,344 +3,327 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>whoopee · fused</title>
+<title>whoopee — fused</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0e0d;
-    --panel: #0f1413;
-    --panel-2: #131a18;
-    --line: #1d2825;
-    --ink: #c8d4cf;
-    --ink-dim: #6f817b;
-    --ink-faint: #44524d;
-    --green: #3fe08f;
-    --green-deep: #1a7a4d;
-    --amber: #e0b13f;
-    --red: #e0623f;
-    --whoop: #5b8def;
-    --es: #3fe08f;
-    --mono: "Berkeley Mono", "SF Mono", ui-monospace, "JetBrains Mono", "Menlo", monospace;
+    --bg: #0b0e12;
+    --bg-2: #0e1217;
+    --panel: #0f141a;
+    --line: #1b222b;
+    --line-2: #232c37;
+    --ink: #dde4ea;
+    --dim: #7c8a98;
+    --faint: #4a5663;
+    --ghost: #2f3945;
+    --green: #00d892;
+    --green-soft: #2bd07f;
+    --blue: #5b8def;
+    --amber: #e8b339;
+    --red: #f0664a;
+    --sans: "Inter", -apple-system, system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--mono); }
-  /* grain overlay */
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
   body::before {
     content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
-    opacity: 0.035; mix-blend-mode: screen;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.025; mix-blend-mode: screen;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 22px 80px; }
-  header { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 22px; }
-  .title { font-size: 13px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--ink); }
-  .title b { color: var(--green); }
-  .meta { font-size: 11px; color: var(--ink-faint); letter-spacing: 0.12em; }
-  .meta a { color: var(--ink-dim); text-decoration: none; border-bottom: 1px dotted var(--ink-faint); cursor: pointer; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 30px 24px 90px; }
 
+  /* header */
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; }
+  .brand { font-family: var(--mono); font-size: 12px; letter-spacing: 0.34em; text-transform: uppercase; color: var(--dim); }
+  .brand b { color: var(--ink); font-weight: 500; }
+  .brand .x { color: var(--green); margin: 0 2px; }
+  .hdr-r { display: flex; align-items: center; gap: 18px; font-family: var(--mono); font-size: 11px; color: var(--faint); letter-spacing: 0.05em; }
+  .hdr-r button { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); background: transparent; border: 1px solid var(--line-2); border-radius: 1px; padding: 5px 11px; cursor: pointer; transition: all .15s; }
+  .hdr-r button:hover { color: var(--green); border-color: var(--green); }
+
+  /* today strip */
+  .today { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 2px; margin-bottom: 14px; overflow: hidden; }
+  .cell { background: var(--panel); padding: 12px 13px 13px; position: relative; }
+  .cell .ck { font-family: var(--mono); font-size: 9px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--dim); }
+  .cell .cv { font-size: 25px; font-weight: 500; margin-top: 7px; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .cell .cz { font-family: var(--mono); font-size: 10px; margin-top: 4px; letter-spacing: 0.02em; }
+  .z-hi { color: var(--green); } .z-lo { color: var(--red); } .z-mid { color: var(--faint); }
+  @media (max-width: 900px) { .today { grid-template-columns: repeat(4, 1fr); } }
+
+  /* grid */
   .grid { display: grid; gap: 14px; grid-template-columns: repeat(12, 1fr); }
-  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 3px; padding: 16px 18px; position: relative; }
-  .panel::after { /* corner ticks, instrument feel */
-    content: ""; position: absolute; top: 6px; right: 8px; width: 5px; height: 5px;
-    border-top: 1px solid var(--ink-faint); border-right: 1px solid var(--ink-faint); opacity: 0.6;
-  }
-  .label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 10px; }
-  .big { font-variant-numeric: tabular-nums; font-size: 46px; line-height: 1; color: var(--green); font-weight: 500; }
-  .unit { font-size: 13px; color: var(--ink-dim); margin-left: 6px; letter-spacing: 0.05em; }
-  .sub { font-size: 11px; color: var(--ink-faint); margin-top: 8px; line-height: 1.5; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 2px; padding: 18px 20px; position: relative; }
+  .col-3 { grid-column: span 3; } .col-4 { grid-column: span 4; } .col-5 { grid-column: span 5; }
+  .col-6 { grid-column: span 6; } .col-7 { grid-column: span 7; } .col-8 { grid-column: span 8; } .col-12 { grid-column: span 12; }
+  @media (max-width: 900px) { [class^="col-"] { grid-column: span 12; } }
 
-  .col-3 { grid-column: span 3; }
-  .col-4 { grid-column: span 4; }
-  .col-5 { grid-column: span 5; }
-  .col-6 { grid-column: span 6; }
-  .col-7 { grid-column: span 7; }
-  .col-8 { grid-column: span 8; }
-  .col-12 { grid-column: span 12; }
-  @media (max-width: 820px) { [class^="col-"] { grid-column: span 12; } }
+  .label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.17em; text-transform: uppercase; color: var(--dim); display: flex; justify-content: space-between; align-items: baseline; }
+  .label .hint { color: var(--ghost); letter-spacing: 0.04em; text-transform: none; font-size: 10px; }
+  .sub { font-size: 12px; color: var(--faint); line-height: 1.6; margin-top: 8px; }
+  .sub b { color: var(--dim); font-weight: 500; }
+
+  .hero-num { font-size: 58px; font-weight: 600; line-height: 1; color: var(--green); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; margin-top: 14px; }
+  .hero-num .unit { font-size: 15px; color: var(--faint); font-weight: 400; margin-left: 8px; letter-spacing: 0; }
 
   /* agreement bars */
-  .bars { display: flex; flex-direction: column; gap: 11px; margin-top: 4px; }
-  .bar-row { display: grid; grid-template-columns: 90px 1fr 48px; align-items: center; gap: 10px; font-size: 11px; }
-  .bar-row .k { color: var(--ink-dim); letter-spacing: 0.1em; text-transform: uppercase; }
-  .track { height: 8px; background: #0a0f0d; border: 1px solid var(--line); border-radius: 2px; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.4); }
-  .fill { height: 100%; width: 0; background: linear-gradient(90deg, #2bd07f, #6dffb0); box-shadow: 0 0 8px rgba(63,224,143,0.5); transition: width 1.1s cubic-bezier(.2,.8,.2,1); }
-  .bar-row .v { text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .bars { display: flex; flex-direction: column; gap: 13px; margin-top: 18px; }
+  .bar-row { display: grid; grid-template-columns: 88px 1fr 40px; align-items: center; gap: 12px; }
+  .bar-row .k { font-family: var(--mono); font-size: 10px; color: var(--dim); letter-spacing: 0.06em; text-transform: uppercase; }
+  .track { height: 3px; background: var(--bg); border-radius: 0; overflow: hidden; }
+  .fill { height: 100%; width: 0; background: var(--green); transition: width 1s cubic-bezier(.2,.8,.2,1); }
+  .bar-row .v { text-align: right; font-family: var(--mono); font-size: 12px; color: var(--ink); font-variant-numeric: tabular-nums; }
 
-  /* comeback */
-  .delta { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 4px; }
-  .delta .item { min-width: 92px; }
-  .delta .dk { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-dim); }
-  .delta .dv { font-size: 26px; font-variant-numeric: tabular-nums; margin-top: 4px; }
-  .arrow-up { color: var(--green); } .arrow-down { color: var(--red); } .flat { color: var(--ink-dim); }
+  /* drivers */
+  .drivers { margin-top: 14px; display: flex; flex-direction: column; gap: 2px; }
+  .drv { display: grid; grid-template-columns: 130px 1fr 44px; align-items: center; gap: 10px; padding: 5px 0; }
+  .drv .dk { font-size: 12px; color: var(--ink); }
+  .drv .dbar { height: 18px; position: relative; background: var(--bg); }
+  .drv .dbar .mid { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--line-2); }
+  .drv .dseg { position: absolute; top: 3px; bottom: 3px; }
+  .drv .dseg.pos { left: 50%; background: linear-gradient(90deg, var(--green-soft), var(--green)); }
+  .drv .dseg.neg { right: 50%; background: linear-gradient(90deg, var(--red), #b8472f); }
+  .drv .dv { text-align: right; font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .drv .dv.pos { color: var(--green); } .drv .dv.neg { color: var(--red); }
 
-  canvas { display: block; width: 100%; }
-  .legend { display: flex; gap: 18px; font-size: 11px; color: var(--ink-dim); margin-top: 8px; }
-  .legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+  /* delta items */
+  .delta { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 16px; }
+  .delta .dk { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); }
+  .delta .dv { font-size: 28px; font-weight: 500; font-variant-numeric: tabular-nums; margin-top: 6px; letter-spacing: -0.01em; }
+  .delta .was { font-family: var(--mono); font-size: 10px; color: var(--faint); margin-top: 3px; }
+  .up { color: var(--green); } .down { color: var(--red); } .flat { color: var(--dim); }
 
-  table { width: 100%; border-collapse: collapse; font-size: 11px; font-variant-numeric: tabular-nums; }
-  th, td { text-align: right; padding: 5px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-  th { color: var(--ink-dim); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; font-size: 10px; position: sticky; top: 0; background: var(--panel); }
-  td:first-child, th:first-child { text-align: left; color: var(--ink-dim); }
-  .scroll { max-height: 360px; overflow-y: auto; }
-  .src-w { color: var(--whoop); } .src-e { color: var(--es); }
-  .tag { font-size: 9px; border: 1px solid var(--line); border-radius: 2px; padding: 1px 4px; letter-spacing: 0.1em; }
-  .loading { color: var(--ink-faint); font-size: 12px; letter-spacing: 0.1em; }
-  .flash { animation: flash 1.2s ease-out; }
-  @keyframes flash { from { background: var(--panel-2); } to { background: var(--panel); } }
+  /* chart */
+  canvas { display: block; width: 100%; cursor: crosshair; }
+  .legend { display: flex; gap: 16px; font-family: var(--mono); font-size: 10px; color: var(--dim); margin-top: 10px; align-items: center; }
+  .legend .dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; vertical-align: middle; }
+  .legend .muted { color: var(--ghost); margin-left: auto; letter-spacing: 0.02em; }
+  .tip { position: fixed; pointer-events: none; background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 2px; padding: 8px 10px; font-family: var(--mono); font-size: 10px; color: var(--ink); z-index: 100; opacity: 0; transition: opacity .1s; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,.5); }
+  .tip .tr { display: flex; justify-content: space-between; gap: 16px; }
+  .tip .td { color: var(--dim); }
+
+  /* table */
+  .scroll { max-height: 380px; overflow-y: auto; margin-top: 12px; }
+  .scroll::-webkit-scrollbar { width: 8px; } .scroll::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 0; }
+  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 9px; white-space: nowrap; border-bottom: 1px solid var(--bg); }
+  th { color: var(--dim); font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; font-size: 9px; position: sticky; top: 0; background: var(--panel); border-bottom: 1px solid var(--line); }
+  tbody tr:hover td { background: var(--bg-2); }
+  td:first-child, th:first-child { text-align: left; color: var(--dim); }
+  .w { color: var(--blue); } .e { color: var(--green); }
+  .tag { font-size: 8px; border: 1px solid var(--line-2); padding: 1px 4px; letter-spacing: 0.08em; border-radius: 1px; }
+  .loading { font-family: var(--mono); color: var(--faint); font-size: 12px; letter-spacing: 0.12em; padding: 40px 0; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="title">whoop <b>×</b> eight sleep · <b>fused</b></div>
-    <div class="meta"><span id="stamp">—</span> · <a id="refresh">re-pull</a></div>
+    <div class="brand">whoop<span class="x">×</span>eight sleep <b>· fused</b></div>
+    <div class="hdr-r"><span id="stamp">—</span><button id="refresh">re-pull</button></div>
   </header>
-
   <div id="root"><div class="loading">acquiring signal…</div></div>
 </div>
+<div class="tip" id="tip"></div>
 
 <script>
-const fmt = (v, d=1) => v == null ? "—" : (+v).toFixed(d);
-const $ = (s, p=document) => p.querySelector(s);
+const $ = (s,p=document)=>p.querySelector(s);
+const fmt=(v,d=1)=>v==null?"—":(+v).toFixed(d);
+const tip = $("#tip");
 
-async function load(refresh=false) {
-  const root = $("#root");
-  root.innerHTML = `<div class="loading">${refresh ? "re-pulling both sources…" : "acquiring signal…"}</div>`;
-  const r = await fetch("/api/summary" + (refresh ? "?refresh=1" : ""));
-  const data = await r.json();
-  render(data);
+async function load(refresh=false){
+  $("#root").innerHTML = `<div class="loading">${refresh?"re-pulling both sources… (~30s)":"acquiring signal…"}</div>`;
+  const r = await fetch("/api/summary"+(refresh?"?refresh=1":""));
+  render(await r.json());
 }
 
-function render(data) {
-  const { nights, trust, comeback } = data;
-  $("#stamp").textContent = new Date(data.pulled_at * 1000).toLocaleString();
+function render(data){
+  const {nights, trust, comeback, drivers, today} = data;
+  $("#stamp").textContent = new Date(data.pulled_at*1000).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const c = comeback, base = c.baseline_eightsleep_avg, recent = c.recent7_eightsleep_avg;
 
-  const agree = trust.overall_agreement;
-  const agreePct = agree == null ? 0 : Math.round(agree * 100);
-  const c = comeback;
-  const base = c.baseline_eightsleep_avg, recent = c.recent7_eightsleep_avg;
-
-  const root = $("#root");
-  root.innerHTML = `
+  $("#root").innerHTML = `
+    ${today && today.metrics ? todayStrip(today) : ""}
     <div class="grid">
-      <!-- HERO: device agreement -->
       <div class="panel col-5">
-        <div class="label">device agreement · two sensors, one body</div>
-        <div class="big"><span id="agreeNum">0</span><span class="unit">/ 100</span></div>
-        <div class="sub">${trust.overlapping_nights} nights with both WHOOP + Eight Sleep on. Trend correlation across independent sensors — higher means they tell the same story.</div>
-        <div class="bars" style="margin-top:16px">
-          ${bar("HRV", trust.correlations.hrv)}
-          ${bar("resting HR", trust.correlations.resting_hr)}
-          ${bar("respiratory", trust.correlations.respiratory)}
+        <div class="label"><span>device agreement</span><span class="hint">two sensors · one body</span></div>
+        <div class="hero-num"><span id="agree">0</span><span class="unit">/ 100</span></div>
+        <div class="sub">${trust.overlapping_nights} nights with both on. Trend correlation across independent hardware — they tell the same story.</div>
+        <div class="bars">
+          ${barRow("HRV", trust.correlations.hrv)}
+          ${barRow("resting HR", trust.correlations.resting_hr)}
+          ${barRow("respiratory", trust.correlations.respiratory)}
         </div>
       </div>
 
-      <!-- comeback -->
       <div class="panel col-7">
-        <div class="label">the comeback · eight sleep covered the gap</div>
-        ${c.gap ? `<div class="sub" style="margin-top:0;margin-bottom:14px">WHOOP last worn <b style="color:var(--ink)">${c.gap.last_worn_before}</b> — <b style="color:var(--amber)">${c.gap.days} days</b> ago. The mattress kept logging every night since.</div>` : ``}
+        <div class="label"><span>the comeback</span><span class="hint">eight sleep covered the gap</span></div>
+        ${c.gap?`<div class="sub">WHOOP last worn <b>${c.gap.last_worn_before}</b> · <span style="color:var(--amber)">${c.gap.days} days ago</span>. The mattress kept logging every night since.</div>`:""}
         <div class="delta">
-          ${deltaItem("sleep score", base.sleep_score, recent.sleep_score, 0)}
+          ${deltaItem("sleep score", base.sleep_score, recent.sleep_score, 0, true)}
           ${deltaItem("hrv", base.hrv, recent.hrv, 1, true)}
           ${deltaItem("resting hr", base.hr, recent.hr, 1, false)}
         </div>
-        <div class="sub" style="margin-top:14px">baseline = Eight Sleep while you wore WHOOP · now = last 7 nights. ${arrowsExplain(base, recent)}</div>
       </div>
 
-      <!-- dual-sensor trend -->
+      <div class="panel col-7">
+        <div class="label"><span>what drives your sleep</span><span class="hint">correlation across ${drivers.n} nights</span></div>
+        <div class="drivers">${drivers.sleep_score_drivers.map(driverRow).join("")}</div>
+        <div class="sub">${driverNarrative(drivers.sleep_score_drivers, "sleep score")}</div>
+      </div>
+
+      <div class="panel col-5">
+        <div class="label"><span>what drives your hrv</span><span class="hint">recovery's leading signal</span></div>
+        <div class="drivers">${drivers.hrv_drivers.slice(0,4).map(driverRow).join("")}</div>
+        <div class="sub">${driverNarrative(drivers.hrv_drivers, "HRV")}</div>
+      </div>
+
       <div class="panel col-8">
-        <div class="label">hrv trend · whoop rmssd vs eight sleep (z-scored)</div>
-        <canvas id="hrvChart" height="220"></canvas>
+        <div class="label"><span>hrv trend</span><span class="hint">whoop rmssd vs eight sleep · z-scored</span></div>
+        <canvas id="hrvChart" height="230"></canvas>
         <div class="legend">
-          <span><span class="dot" style="background:var(--whoop)"></span>WHOOP</span>
-          <span><span class="dot" style="background:var(--es)"></span>Eight Sleep</span>
-          <span style="color:var(--ink-faint)">z-scored so different scales overlay; shape is what matters</span>
+          <span><span class="dot" style="background:var(--blue)"></span>WHOOP</span>
+          <span><span class="dot" style="background:var(--green)"></span>Eight Sleep</span>
+          <span class="muted">hover for any night</span>
         </div>
       </div>
 
-      <!-- coverage + comeback timeline -->
       <div class="panel col-4">
-        <div class="label">coverage · sleep score over time</div>
-        <div style="display:flex;gap:18px;margin-bottom:10px">
-          <div><span class="big" style="font-size:26px;color:var(--whoop)">${c.whoop_active_nights}</span><div class="sub" style="margin-top:0">WHOOP nights</div></div>
-          <div><span class="big" style="font-size:26px;color:var(--es)">${c.eightsleep_only_nights}</span><div class="sub" style="margin-top:0">ES-only nights</div></div>
+        <div class="label"><span>coverage</span></div>
+        <div style="display:flex;gap:22px;margin:14px 0 4px">
+          <div><div class="hero-num" style="font-size:30px;color:var(--blue);margin-top:0">${c.whoop_active_nights}</div><div class="sub" style="margin-top:2px">WHOOP nights</div></div>
+          <div><div class="hero-num" style="font-size:30px;color:var(--green);margin-top:0">${c.eightsleep_only_nights}</div><div class="sub" style="margin-top:2px">ES-only nights</div></div>
         </div>
-        <canvas id="scoreChart" height="120"></canvas>
-        <div class="sub" style="margin-top:8px">Eight Sleep nightly score — the line never breaks, even across the ${c.gap ? c.gap.days + "-day" : ""} WHOOP gap.</div>
+        <canvas id="scoreChart" height="96"></canvas>
+        <div class="sub">Eight Sleep sleep score — the line never breaks across the gap.</div>
       </div>
 
-      <!-- nights table -->
       <div class="panel col-12">
-        <div class="label">nightly log · ${nights.length} nights</div>
-        <div class="scroll">
-          <table>
-            <thead><tr>
-              <th>night</th><th>rec</th><th class="src-w">W·hrv</th><th class="src-w">W·rhr</th>
-              <th class="src-e">E·score</th><th class="src-e">E·hrv</th><th class="src-e">E·hr</th><th class="src-e">E·sleep</th><th>src</th>
-            </tr></thead>
-            <tbody>
-              ${nights.slice().reverse().map(rowHtml).join("")}
-            </tbody>
-          </table>
-        </div>
+        <div class="label"><span>nightly log</span><span class="hint">${nights.length} nights</span></div>
+        <div class="scroll"><table>
+          <thead><tr>
+            <th>night</th><th>rec</th><th>strain</th><th class="w">W·hrv</th><th class="w">W·rhr</th><th class="w">deep%</th>
+            <th class="e">E·score</th><th class="e">E·hrv</th><th class="e">E·hr</th><th class="e">deep%</th><th class="e">rem%</th><th class="e">sleep</th><th>src</th>
+          </tr></thead>
+          <tbody>${nights.slice().reverse().map(rowHtml).join("")}</tbody>
+        </table></div>
       </div>
     </div>`;
 
-  animateCount("#agreeNum", agreePct, 0);
-  requestAnimationFrame(() => {
-    $("#hrvBar") && null;
-    document.querySelectorAll(".fill").forEach(f => f.style.width = f.dataset.w + "%");
-  });
+  countUp("#agree", Math.round((trust.overall_agreement||0)*100));
+  requestAnimationFrame(()=>document.querySelectorAll(".fill").forEach(f=>f.style.width=f.dataset.w+"%"));
   drawHrv(nights);
   drawScore(nights);
 }
 
-function bar(k, corr) {
-  const pct = corr == null ? 0 : Math.round(corr * 100);
-  return `<div class="bar-row"><span class="k">${k}</span><span class="track"><span class="fill" data-w="${pct}"></span></span><span class="v">${corr==null?"—":corr.toFixed(2)}</span></div>`;
+function todayStrip(t){
+  const m=t.metrics;
+  const order=[["sleep_score","score",0],["hrv","hrv",1],["resting_hr","rest hr",0],["respiratory","resp",1],["sleep_hours","sleep",1],["deep_pct","deep %",0],["rem_pct","rem %",0],["sleep_debt","debt",1]];
+  const cells=order.filter(([k])=>m[k]&&m[k].latest!=null).map(([k,lbl,d])=>{
+    const x=m[k]; const z=x.z;
+    let cls="z-mid", arrow="·";
+    if(z!=null&&Math.abs(z)>=0.5){ const good=x.higher_good?z>0:z<0; cls=good?"z-hi":"z-lo"; arrow=z>0?"▲":"▼"; }
+    const zt = z==null?"":`${arrow} ${z>0?"+":""}${z} σ`;
+    return `<div class="cell"><div class="ck">${lbl}</div><div class="cv">${fmt(x.latest,d)}</div><div class="cz ${cls}">${zt}</div></div>`;
+  }).join("");
+  return `<div class="today">${cells}</div>`;
 }
 
-function deltaItem(k, from, to, d, higherGood=true) {
-  if (from == null || to == null) return `<div class="item"><div class="dk">${k}</div><div class="dv flat">${fmt(to,d)}</div></div>`;
-  const diff = to - from;
-  const up = diff > 0;
-  const good = higherGood ? up : !up;
-  const cls = Math.abs(diff) < (d===0?0.5:0.05) ? "flat" : good ? "arrow-up" : "arrow-down";
-  const sym = Math.abs(diff) < (d===0?0.5:0.05) ? "→" : up ? "↑" : "↓";
-  return `<div class="item"><div class="dk">${k}</div><div class="dv ${cls}">${fmt(to,d)} <span style="font-size:14px">${sym}</span></div><div class="sub" style="margin-top:2px">was ${fmt(from,d)}</div></div>`;
+function barRow(k,c){const p=c==null?0:Math.round(c*100);return `<div class="bar-row"><span class="k">${k}</span><span class="track"><span class="fill" data-w="${p}"></span></span><span class="v">${c==null?"—":c.toFixed(2)}</span></div>`;}
+
+function driverRow(d){
+  const mag=Math.min(100, Math.abs(d.r)*140);
+  const pos=d.r>=0;
+  return `<div class="drv"><span class="dk">${d.label}</span><span class="dbar"><span class="mid"></span><span class="dseg ${pos?'pos':'neg'}" style="width:${mag/2}%"></span></span><span class="dv ${pos?'pos':'neg'}">${pos?"+":""}${d.r.toFixed(2)}</span></div>`;
+}
+function driverNarrative(ds, outcome){
+  if(!ds.length) return "";
+  const top=ds[0]; const dir=top.r>=0?"more":"less";
+  return `<b>${top.label}</b> is your strongest lever — ${dir} of it tracks higher ${outcome} (r ${top.r>=0?"+":""}${top.r.toFixed(2)}).`;
 }
 
-function arrowsExplain(b, r) {
-  if (b.hrv == null || r.hrv == null) return "";
-  const hrvUp = r.hrv >= b.hrv;
-  return hrvUp ? "HRV is back up — recovery trending the right way." : "HRV still below baseline — the gap left a mark; watch it climb as you settle back in.";
+function deltaItem(k,from,to,d,higherGood){
+  if(from==null||to==null) return `<div><div class="dk">${k}</div><div class="dv flat">${fmt(to,d)}</div></div>`;
+  const diff=to-from, eps=d===0?0.5:0.05;
+  const flat=Math.abs(diff)<eps, up=diff>0, good=higherGood?up:!up;
+  const cls=flat?"flat":good?"up":"down", sym=flat?"→":up?"↑":"↓";
+  return `<div><div class="dk">${k}</div><div class="dv ${cls}">${fmt(to,d)} <span style="font-size:15px">${sym}</span></div><div class="was">was ${fmt(from,d)}</div></div>`;
 }
 
-function rowHtml(n) {
-  const tag = n.sources.map(s => s==="whoop"?`<span class="tag src-w">W</span>`:`<span class="tag src-e">E</span>`).join(" ");
+function rowHtml(n){
+  const tag=n.sources.map(s=>s==="whoop"?`<span class="tag w">W</span>`:`<span class="tag e">E</span>`).join(" ");
   return `<tr>
     <td>${n.date}</td>
     <td>${n.whoop_recovery==null?"—":Math.round(n.whoop_recovery)}</td>
-    <td class="src-w">${fmt(n.whoop_hrv_ms,0)}</td>
-    <td class="src-w">${fmt(n.whoop_rhr,0)}</td>
-    <td class="src-e">${n.es_score==null?"—":n.es_score}</td>
-    <td class="src-e">${fmt(n.es_hrv,1)}</td>
-    <td class="src-e">${fmt(n.es_hr,0)}</td>
-    <td class="src-e">${fmt(n.es_sleep_hours,1)}</td>
-    <td>${tag}</td>
-  </tr>`;
+    <td>${fmt(n.whoop_strain,1)}</td>
+    <td class="w">${fmt(n.whoop_hrv_ms,0)}</td>
+    <td class="w">${fmt(n.whoop_rhr,0)}</td>
+    <td class="w">${fmt(n.whoop_deep_pct,0)}</td>
+    <td class="e">${n.es_score==null?"—":n.es_score}</td>
+    <td class="e">${fmt(n.es_hrv,1)}</td>
+    <td class="e">${fmt(n.es_hr,0)}</td>
+    <td class="e">${fmt(n.es_deep_pct,0)}</td>
+    <td class="e">${fmt(n.es_rem_pct,0)}</td>
+    <td class="e">${fmt(n.es_sleep_hours,1)}</td>
+    <td>${tag}</td></tr>`;
 }
 
-function animateCount(sel, target, decimals) {
-  const el = $(sel); if (!el) return;
-  const start = performance.now(), dur = 1100;
-  function tick(t) {
-    const p = Math.min(1, (t - start) / dur);
-    const e = 1 - Math.pow(1 - p, 3);
-    el.textContent = (target * e).toFixed(decimals);
-    if (p < 1) requestAnimationFrame(tick);
+function countUp(sel,target){const el=$(sel);if(!el)return;const t0=performance.now();function tk(t){const p=Math.min(1,(t-t0)/1000);el.textContent=Math.round(target*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(tk);}requestAnimationFrame(tk);}
+
+function zscore(a){const v=a.filter(x=>x!=null);if(v.length<2)return a.map(()=>null);const mu=v.reduce((x,y)=>x+y,0)/v.length;const sd=Math.sqrt(v.reduce((x,y)=>x+(y-mu)**2,0)/v.length)||1;return a.map(x=>x==null?null:(x-mu)/sd);}
+
+let hrvState=null;
+function drawHrv(nights){
+  const cv=$("#hrvChart");if(!cv)return;
+  const dpr=devicePixelRatio||1, W=cv.clientWidth, H=230;
+  cv.width=W*dpr;cv.height=H*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+  const w=zscore(nights.map(n=>n.whoop_hrv_ms)), e=zscore(nights.map(n=>n.es_hrv));
+  const pad={l:26,r:14,t:14,b:20}, iW=W-pad.l-pad.r, iH=H-pad.t-pad.b;
+  const all=[...w,...e].filter(x=>x!=null), min=Math.min(-2.4,...all), max=Math.max(2.4,...all);
+  const X=i=>pad.l+iW*i/Math.max(1,nights.length-1), Y=v=>pad.t+iH*(1-(v-min)/(max-min));
+  hrvState={nights,w,e,X,Y,pad,W,H,iH};
+  paintHrv(-1);
+}
+function paintHrv(hover){
+  const s=hrvState;if(!s)return;const cv=$("#hrvChart");const ctx=cv.getContext("2d");
+  ctx.clearRect(0,0,s.W,s.H);
+  ctx.font="9px 'JetBrains Mono',monospace";
+  // overlap band: where both sensors recorded HRV — the validation window
+  const ov=s.nights.map((n,i)=>(n.whoop_hrv_ms!=null&&n.es_hrv!=null)?i:null).filter(i=>i!=null);
+  if(ov.length){const x0=s.X(Math.min(...ov)),x1=s.X(Math.max(...ov));ctx.fillStyle="rgba(91,141,239,0.07)";ctx.fillRect(x0,s.pad.t,Math.max(2,x1-x0),s.iH);ctx.fillStyle="#3a4a5e";ctx.fillText("overlap",x0+3,s.pad.t+10);}
+  for(let g=-2;g<=2;g++){const yy=s.Y(g);ctx.strokeStyle="#1b222b";ctx.globalAlpha=g===0?1:0.45;ctx.beginPath();ctx.moveTo(s.pad.l,yy);ctx.lineTo(s.W-s.pad.r,yy);ctx.stroke();ctx.globalAlpha=1;ctx.fillStyle="#4a5663";ctx.fillText((g>0?"+":"")+g,4,yy+3);}
+  const line=(vals,color)=>{ctx.strokeStyle=color;ctx.lineWidth=1.6;ctx.beginPath();let st=false;vals.forEach((v,i)=>{if(v==null){st=false;return;}const px=s.X(i),py=s.Y(v);if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);});ctx.stroke();};
+  line(s.e,"#00d892");line(s.w,"#5b8def");
+  if(hover>=0){const px=s.X(hover);ctx.strokeStyle="#2f3945";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(px,s.pad.t);ctx.lineTo(px,s.pad.t+s.iH);ctx.stroke();
+    [["#5b8def",s.w],["#00d892",s.e]].forEach(([c,v])=>{if(v[hover]!=null){ctx.fillStyle=c;ctx.beginPath();ctx.arc(px,s.Y(v[hover]),3,0,7);ctx.fill();}});
   }
-  requestAnimationFrame(tick);
+}
+function hrvHover(ev){
+  const s=hrvState;if(!s)return;const cv=$("#hrvChart");const rect=cv.getBoundingClientRect();
+  const x=ev.clientX-rect.left;const i=Math.round((x-s.pad.l)/((s.W-s.pad.l-s.pad.r)/Math.max(1,s.nights.length-1)));
+  if(i<0||i>=s.nights.length){tip.style.opacity=0;paintHrv(-1);return;}
+  const n=s.nights[i];paintHrv(i);
+  tip.innerHTML=`<div style="color:var(--dim);margin-bottom:4px">${n.date}</div>
+    <div class="tr"><span class="td">WHOOP hrv</span><span class="w">${fmt(n.whoop_hrv_ms,0)} ms</span></div>
+    <div class="tr"><span class="td">ES hrv</span><span class="e">${fmt(n.es_hrv,1)}</span></div>
+    <div class="tr"><span class="td">rec / score</span><span>${n.whoop_recovery==null?"—":Math.round(n.whoop_recovery)} / ${n.es_score??"—"}</span></div>`;
+  tip.style.left=(ev.clientX+14)+"px";tip.style.top=(ev.clientY+14)+"px";tip.style.opacity=1;
+}
+document.addEventListener("mousemove",e=>{if(e.target&&e.target.id==="hrvChart")hrvHover(e);else if(tip.style.opacity!="0"){tip.style.opacity=0;paintHrv(-1);}});
+
+function drawScore(nights){
+  const cv=$("#scoreChart");if(!cv)return;const dpr=devicePixelRatio||1,W=cv.clientWidth,H=96;
+  cv.width=W*dpr;cv.height=H*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+  const pad={l:4,r:4,t:8,b:4},iW=W-pad.l-pad.r,iH=H-pad.t-pad.b;
+  const X=i=>pad.l+iW*i/Math.max(1,nights.length-1),Y=v=>pad.t+iH*(1-(v-40)/60);
+  const wIdx=nights.map((n,i)=>n.whoop_recovery!=null?i:null).filter(i=>i!=null);
+  if(wIdx.length){ctx.fillStyle="rgba(91,141,239,0.10)";const x0=X(Math.min(...wIdx)),x1=X(Math.max(...wIdx));ctx.fillRect(x0,pad.t,Math.max(2,x1-x0),iH);ctx.fillStyle="#5b8def";ctx.font="8px 'JetBrains Mono'";ctx.fillText("WHOOP era",x0+3,pad.t+9);}
+  ctx.beginPath();let st=false;nights.forEach((n,i)=>{if(n.es_score==null)return;const px=X(i),py=Y(n.es_score);if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);});ctx.strokeStyle="#00d892";ctx.lineWidth=1.3;ctx.stroke();
 }
 
-function zscore(arr) {
-  const v = arr.filter(x => x != null);
-  if (v.length < 2) return arr.map(() => null);
-  const mu = v.reduce((a,b)=>a+b,0)/v.length;
-  const sd = Math.sqrt(v.reduce((a,b)=>a+(b-mu)**2,0)/v.length) || 1;
-  return arr.map(x => x==null?null:(x-mu)/sd);
-}
-
-function drawHrv(nights) {
-  const cv = $("#hrvChart"); if (!cv) return;
-  const dpr = window.devicePixelRatio || 1;
-  const W = cv.clientWidth, H = 220;
-  cv.width = W * dpr; cv.height = H * dpr;
-  const ctx = cv.getContext("2d"); ctx.scale(dpr, dpr);
-
-  const w = zscore(nights.map(n => n.whoop_hrv_ms));
-  const e = zscore(nights.map(n => n.es_hrv));
-  const pad = {l: 28, r: 12, t: 14, b: 22};
-  const innerW = W - pad.l - pad.r, innerH = H - pad.t - pad.b;
-  const all = [...w, ...e].filter(x => x != null);
-  const min = Math.min(-2.2, ...all), max = Math.max(2.2, ...all);
-  const x = i => pad.l + (innerW * i / Math.max(1, nights.length - 1));
-  const y = v => pad.t + innerH * (1 - (v - min) / (max - min));
-
-  // grid
-  ctx.strokeStyle = "#1d2825"; ctx.lineWidth = 1; ctx.font = "9px monospace"; ctx.fillStyle = "#44524d";
-  for (let g = -2; g <= 2; g++) {
-    const yy = y(g); ctx.globalAlpha = g===0?0.8:0.35;
-    ctx.beginPath(); ctx.moveTo(pad.l, yy); ctx.lineTo(W - pad.r, yy); ctx.stroke();
-    ctx.globalAlpha = 1; ctx.fillText(g.toString().padStart(2), 6, yy + 3);
-  }
-
-  const series = (vals, color, prog) => {
-    ctx.strokeStyle = color; ctx.lineWidth = 1.6; ctx.beginPath();
-    let started = false, drawn = 0;
-    const target = Math.floor(nights.length * prog);
-    for (let i = 0; i < nights.length; i++) {
-      if (vals[i] == null) { started = false; continue; }
-      if (i > target) break;
-      const px = x(i), py = y(vals[i]);
-      if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
-      drawn++;
-    }
-    ctx.stroke();
-    // dots on last points
-    ctx.fillStyle = color;
-    for (let i = Math.max(0, target-1); i <= target && i < nights.length; i++) {
-      if (vals[i] != null) { ctx.beginPath(); ctx.arc(x(i), y(vals[i]), 2.4, 0, 7); ctx.fill(); }
-    }
-  };
-
-  // animate the sweep
-  const t0 = performance.now(), dur = 1400;
-  function frame(t) {
-    const prog = Math.min(1, (t - t0) / dur);
-    ctx.clearRect(0,0,W,H);
-    ctx.strokeStyle = "#1d2825"; ctx.fillStyle = "#44524d";
-    for (let g = -2; g <= 2; g++) {
-      const yy = y(g); ctx.globalAlpha = g===0?0.8:0.35;
-      ctx.beginPath(); ctx.moveTo(pad.l, yy); ctx.lineTo(W - pad.r, yy); ctx.stroke();
-      ctx.globalAlpha = 1; ctx.fillText(g.toString().padStart(2), 6, yy + 3);
-    }
-    series(e, "#3fe08f", prog);
-    series(w, "#5b8def", prog);
-    if (prog < 1) requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-}
-
-function drawScore(nights) {
-  const cv = $("#scoreChart"); if (!cv) return;
-  const dpr = window.devicePixelRatio || 1;
-  const W = cv.clientWidth, H = 120;
-  cv.width = W * dpr; cv.height = H * dpr;
-  const ctx = cv.getContext("2d"); ctx.scale(dpr, dpr);
-  const pad = {l: 6, r: 6, t: 10, b: 6};
-  const innerW = W - pad.l - pad.r, innerH = H - pad.t - pad.b;
-  const x = i => pad.l + innerW * i / Math.max(1, nights.length - 1);
-  const y = v => pad.t + innerH * (1 - (v - 40) / (100 - 40));
-
-  // faint blue underlay marks the WHOOP-active region
-  const wIdx = nights.map((n,i)=> n.whoop_recovery!=null?i:null).filter(i=>i!=null);
-  if (wIdx.length) {
-    ctx.fillStyle = "rgba(91,141,239,0.12)";
-    const x0 = x(Math.min(...wIdx)), x1 = x(Math.max(...wIdx));
-    ctx.fillRect(x0, pad.t, Math.max(2, x1 - x0), innerH);
-    ctx.fillStyle = "#5b8def"; ctx.font = "8px monospace";
-    ctx.fillText("WHOOP era", x0 + 2, pad.t + 9);
-  }
-  // score line
-  ctx.beginPath(); let started = false;
-  nights.forEach((n, i) => {
-    if (n.es_score == null) return;
-    const px = x(i), py = y(n.es_score);
-    if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
-  });
-  ctx.strokeStyle = "#3fe08f"; ctx.lineWidth = 1.4; ctx.stroke();
-}
-
-$("#refresh").addEventListener("click", e => { e.preventDefault(); load(true); });
+$("#refresh").addEventListener("click",()=>load(true));
+addEventListener("resize",()=>{if(hrvState)render.__last&&0;});
 load();
 </script>
 </body>

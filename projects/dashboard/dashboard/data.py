@@ -21,20 +21,21 @@ def _pull(days: int) -> dict:
     whoop = WhoopClient.from_env()
     recoveries = list(whoop.recovery_all(limit=25))
     sleeps = list(whoop.sleep_all(limit=25))
+    cycles = list(whoop.cycles_all(limit=25))
     whoop.close()
 
     es = EightSleepClient.from_env()
     nights = es.recent_nights(days=days)
-
     return {
         "pulled_at": time.time(),
         "whoop_recoveries": recoveries,
         "whoop_sleeps": sleeps,
+        "whoop_cycles": cycles,
         "eightsleep_nights": [n.to_dict() for n in nights],
     }
 
 
-def load(*, days: int = 90, refresh: bool = False, ttl: int = DEFAULT_TTL) -> dict:
+def load(*, days: int = 220, refresh: bool = False, ttl: int = DEFAULT_TTL) -> dict:
     if not refresh and CACHE.exists():
         data = json.loads(CACHE.read_text())
         if time.time() - data.get("pulled_at", 0) < ttl:

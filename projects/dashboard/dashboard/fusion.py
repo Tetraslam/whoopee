@@ -39,41 +39,74 @@ def _night_date(iso_ts: str | None) -> str | None:
 @dataclass
 class FusedNight:
     date: str
-    # whoop
+    # whoop recovery
     whoop_recovery: float | None = None
     whoop_hrv_ms: float | None = None
     whoop_rhr: float | None = None
     whoop_resp: float | None = None
+    whoop_spo2: float | None = None
+    whoop_skin_temp: float | None = None
+    # whoop sleep
     whoop_sleep_perf: float | None = None
+    whoop_sleep_eff: float | None = None
+    whoop_sleep_consistency: float | None = None
     whoop_sleep_hours: float | None = None
+    whoop_deep_pct: float | None = None
+    whoop_rem_pct: float | None = None
+    whoop_light_pct: float | None = None
+    # whoop strain (the load side — from the cycle ending this day)
+    whoop_strain: float | None = None
+    whoop_avg_hr: float | None = None
+    whoop_max_hr: float | None = None
     # eight sleep
     es_score: int | None = None
     es_hrv: float | None = None
     es_hr: float | None = None
     es_resp: float | None = None
     es_sleep_hours: float | None = None
+    es_deep_pct: float | None = None
+    es_rem_pct: float | None = None
     es_tnt: int | None = None
+    es_sleep_debt: float | None = None
     # derived
     sources: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
-        d = self.__dict__.copy()
-        return d
+        return self.__dict__.copy()
 
 
 def _ms_to_hours(milli: float | None) -> float | None:
     return round(milli / 3_600_000, 2) if milli else None
 
 
-def build_nights(whoop_recoveries, whoop_sleeps, es_nights) -> list[FusedNight]:
+def _pct(part: float | None, whole: float | None) -> float | None:
+    if not part or not whole:
+        return None
+    return round(100 * part / whole, 1)
+
+
+def build_nights(whoop_recoveries, whoop_sleeps, es_nights, whoop_cycles=None) -> list[FusedNight]:
     """Merge raw records from both sources into per-night fused records."""
+    whoop_cycles = whoop_cycles or []
     nights: dict[str, FusedNight] = {}
 
     def night(d: str) -> FusedNight:
         return nights.setdefault(d, FusedNight(date=d))
 
-    # WHOOP sleep keyed by id so we can join respiratory/stage data to recovery
     sleep_by_id = {s["id"]: s for s in whoop_sleeps if not s.get("nap")}
+
+    # WHOOP strain: a cycle is a day; key by the date it ends (or starts if open).
+    for cyc in whoop_cycles:
+        d = _night_date(cyc.get("end") or cyc.get("start"))
+        if not d:
+            continue
+        n = night(d)
+        score = cyc.get("score") or {}
+        n.whoop_strain = round(score["strain"], 1) if score.get("strain") is not None else None
+        n.whoop_avg_hr = score.get("average_heart_rate")
+        n.whoop_max_hr = score.get("max_heart_rate")
+        if n.whoop_strain is not None and "whoop" not in n.sources:
+            n.sources.append("whoop")
 
     for rec in whoop_recoveries:
         d = _night_date(rec.get("created_at"))
@@ -86,29 +119,31 @@ def build_nights(whoop_recoveries, whoop_sleeps, es_nights) -> list[FusedNight]:
             round(score["hrv_rmssd_milli"], 1) if score.get("hrv_rmssd_milli") else None
         )
         n.whoop_rhr = score.get("resting_heart_rate")
+        n.whoop_spo2 = round(score["spo2_percentage"], 1) if score.get("spo2_percentage") else None
+        n.whoop_skin_temp = (
+            round(score["skin_temp_celsius"], 1) if score.get("skin_temp_celsius") else None
+        )
         sleep = sleep_by_id.get(rec.get("sleep_id"))
         if sleep:
             ss = sleep.get("score") or {}
             n.whoop_resp = round(ss["respiratory_rate"], 1) if ss.get("respiratory_rate") else None
             n.whoop_sleep_perf = ss.get("sleep_performance_percentage")
+            n.whoop_sleep_eff = (
+                round(ss["sleep_efficiency_percentage"], 1)
+                if ss.get("sleep_efficiency_percentage")
+                else None
+            )
+            n.whoop_sleep_consistency = ss.get("sleep_consistency_percentage")
             stage = ss.get("stage_summary") or {}
             in_bed = stage.get("total_in_bed_time_milli")
             awake = stage.get("total_awake_time_milli") or 0
-            if in_bed:
-                n.whoop_sleep_hours = _ms_to_hours(in_bed - awake)
+            asleep = (in_bed - awake) if in_bed else None
+            if asleep:
+                n.whoop_sleep_hours = _ms_to_hours(asleep)
+                n.whoop_deep_pct = _pct(stage.get("total_slow_wave_sleep_time_milli"), asleep)
+                n.whoop_rem_pct = _pct(stage.get("total_rem_sleep_time_milli"), asleep)
+                n.whoop_light_pct = _pct(stage.get("total_light_sleep_time_milli"), asleep)
         if "whoop" not in n.sources:
-            n.sources.append("whoop")
-
-    # WHOOP sleeps that didn't have a recovery (e.g. naps already filtered)
-    for sleep in sleep_by_id.values():
-        d = _night_date(sleep.get("end"))
-        if not d:
-            continue
-        n = night(d)
-        if n.whoop_resp is None:
-            ss = sleep.get("score") or {}
-            n.whoop_resp = round(ss["respiratory_rate"], 1) if ss.get("respiratory_rate") else None
-        if "whoop" not in n.sources and n.whoop_recovery is not None:
             n.sources.append("whoop")
 
     for es in es_nights:
@@ -120,8 +155,12 @@ def build_nights(whoop_recoveries, whoop_sleeps, es_nights) -> list[FusedNight]:
         n.es_hrv = es.hrv
         n.es_hr = es.heart_rate
         n.es_resp = es.respiratory_rate
-        n.es_sleep_hours = round(es.sleep_duration / 3600, 2) if es.sleep_duration else None
+        es_total = es.sleep_duration
+        n.es_sleep_hours = round(es_total / 3600, 2) if es_total else None
+        n.es_deep_pct = _pct(es.deep_duration, es_total)
+        n.es_rem_pct = _pct(es.rem_duration, es_total)
         n.es_tnt = es.tnt
+        n.es_sleep_debt = round(es.sleep_debt / 3600, 2) if es.sleep_debt else None
         if "eightsleep" not in n.sources:
             n.sources.append("eightsleep")
 
@@ -245,5 +284,105 @@ def comeback_report(nights: list[FusedNight]) -> dict:
             "sleep_score": avg(recent, "es_score"),
             "hrv": avg(recent, "es_hrv"),
             "hr": avg(recent, "es_hr"),
+        },
+    }
+
+
+# --- driver analysis: what actually predicts your sleep & recovery -----------
+
+# Each driver: (attr on the night, human label, whether higher is intuitively
+# "more" of the thing). We correlate the driver on night N against the OUTCOME
+# on night N (same-night inputs like sleep architecture) — sleep score is an
+# outcome of that night's sleep. For recovery we also support next-morning.
+_SLEEP_DRIVERS = [
+    ("es_sleep_hours", "sleep duration"),
+    ("es_deep_pct", "deep sleep %"),
+    ("es_rem_pct", "REM sleep %"),
+    ("es_tnt", "tossing & turning"),
+    ("es_sleep_debt", "sleep debt"),
+    ("es_resp", "respiratory rate"),
+]
+
+
+def _series(nights, attr):
+    return [getattr(n, attr) for n in nights]
+
+
+def driver_report(nights: list[FusedNight]) -> dict:
+    """Rank what moves your Eight Sleep sleep score and your HRV.
+
+    Uses every night Eight Sleep recorded (the long history), correlating each
+    candidate driver against the outcome. Returns drivers sorted by |r|, with
+    sign, so the UI can say "deep sleep % is your strongest lever (+0.62)".
+    """
+    have = [n for n in nights if n.es_score is not None]
+
+    def rank_against(outcome_attr, drivers):
+        out = _series(have, outcome_attr)
+        ranked = []
+        for attr, label in drivers:
+            r = _pearson(_series(have, attr), out)
+            if r is not None:
+                ranked.append({"key": attr, "label": label, "r": r})
+        ranked.sort(key=lambda d: abs(d["r"]), reverse=True)
+        return ranked
+
+    # HRV as outcome: drop hrv itself from drivers
+    hrv_drivers = [(a, lbl) for a, lbl in _SLEEP_DRIVERS if a != "es_resp"]
+
+    return {
+        "n": len(have),
+        "sleep_score_drivers": rank_against("es_score", _SLEEP_DRIVERS),
+        "hrv_drivers": rank_against("es_hrv", hrv_drivers),
+    }
+
+
+# --- rolling baselines & today snapshot --------------------------------------
+
+
+def _rolling_mean(nights, attr, window):
+    vals = [getattr(n, attr) for n in nights[-window:] if getattr(n, attr) is not None]
+    return round(statistics.mean(vals), 1) if vals else None
+
+
+def today_report(nights: list[FusedNight]) -> dict:
+    """The most recent night vs your rolling baselines (7d, 30d).
+
+    For each headline metric, returns the latest value, the 7- and 30-day means,
+    and a z-score of the latest against the 30-day window so the UI can flag
+    "today is unusually low/high for you".
+    """
+    have = [n for n in nights if n.es_score is not None]
+    if not have:
+        return {}
+    latest = have[-1]
+
+    def metric(attr, higher_good=True):
+        latest_v = getattr(latest, attr)
+        window = [getattr(n, attr) for n in have[-30:] if getattr(n, attr) is not None]
+        z = None
+        if latest_v is not None and len(window) >= 3:
+            mu = statistics.mean(window)
+            sd = statistics.pstdev(window) or 1.0
+            z = round((latest_v - mu) / sd, 2)
+        return {
+            "latest": latest_v,
+            "avg7": _rolling_mean(have, attr, 7),
+            "avg30": _rolling_mean(have, attr, 30),
+            "z": z,
+            "higher_good": higher_good,
+        }
+
+    return {
+        "date": latest.date,
+        "metrics": {
+            "sleep_score": metric("es_score"),
+            "hrv": metric("es_hrv"),
+            "resting_hr": metric("es_hr", higher_good=False),
+            "respiratory": metric("es_resp", higher_good=False),
+            "sleep_hours": metric("es_sleep_hours"),
+            "deep_pct": metric("es_deep_pct"),
+            "rem_pct": metric("es_rem_pct"),
+            "sleep_debt": metric("es_sleep_debt", higher_good=False),
         },
     }
