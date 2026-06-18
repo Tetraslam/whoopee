@@ -33,8 +33,9 @@ tools/serve.sh stop dashboard
 ```
 
 The server caches both pulls to `.cache/data.json` (gitignored — it's your
-biometric data) for 30 min. Hit **re-pull** in the UI or `?refresh=1` to force a
-fresh pull.
+biometric data) for 30 min. The page **polls every 10s** and updates values in
+place (no layout movement); hit **re-pull** or `?refresh=1` to force a fresh pull
+past the cache.
 
 ## How it fits together
 

@@ -6,122 +6,140 @@
 <title>whoopee — fused</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0b0e12;
-    --bg-2: #0e1217;
+    --bg: #0a0d11;
+    --bg-2: #11161c;
     --panel: #0f141a;
-    --line: #1b222b;
-    --line-2: #232c37;
-    --ink: #dde4ea;
-    --dim: #7c8a98;
-    --faint: #4a5663;
-    --ghost: #2f3945;
-    --green: #00d892;
-    --green-soft: #2bd07f;
-    --blue: #5b8def;
-    --amber: #e8b339;
-    --red: #f0664a;
+    --panel-2: #131a21;
+    --line: #232c37;
+    --line-2: #313c49;
+    /* text scale — high contrast, four legible steps */
+    --ink: #f0f3f6;       /* primary numbers / values */
+    --ink-2: #c3ccd6;     /* body text */
+    --dim: #94a1ad;       /* labels, units (readable) */
+    --faint: #6b7682;     /* tertiary captions */
+    --green: #1fe096;
+    --green-dim: #15a06d;
+    --blue: #6ea0ff;
+    --amber: #f0bb44;
+    --red: #ff6f54;
     --sans: "Inter", -apple-system, system-ui, sans-serif;
     --mono: "JetBrains Mono", ui-monospace, monospace;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink-2); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
   body::before {
     content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
-    opacity: 0.025; mix-blend-mode: screen;
+    opacity: 0.022; mix-blend-mode: screen;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
   .wrap { max-width: 1200px; margin: 0 auto; padding: 30px 24px 90px; }
 
   /* header */
-  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; }
-  .brand { font-family: var(--mono); font-size: 12px; letter-spacing: 0.34em; text-transform: uppercase; color: var(--dim); }
-  .brand b { color: var(--ink); font-weight: 500; }
-  .brand .x { color: var(--green); margin: 0 2px; }
-  .hdr-r { display: flex; align-items: center; gap: 18px; font-family: var(--mono); font-size: 11px; color: var(--faint); letter-spacing: 0.05em; }
-  .hdr-r button { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); background: transparent; border: 1px solid var(--line-2); border-radius: 1px; padding: 5px 11px; cursor: pointer; transition: all .15s; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+  .brand { font-family: var(--mono); font-size: 13px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--ink); font-weight: 500; }
+  .brand .x { color: var(--green); margin: 0 3px; }
+  .brand .tag { color: var(--dim); }
+  .hdr-r { display: flex; align-items: center; gap: 16px; font-family: var(--mono); font-size: 11px; color: var(--dim); letter-spacing: 0.04em; }
+  .live { display: inline-flex; align-items: center; gap: 6px; color: var(--faint); }
+  .live .pip { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .hdr-r button { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); background: transparent; border: 1px solid var(--line-2); border-radius: 2px; padding: 6px 12px; cursor: pointer; transition: all .15s; }
   .hdr-r button:hover { color: var(--green); border-color: var(--green); }
 
+  /* section heading — a real hierarchy anchor */
+  .label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); display: flex; justify-content: space-between; align-items: baseline; padding-left: 9px; border-left: 2px solid var(--green); }
+  .label .hint { color: var(--faint); letter-spacing: 0.03em; text-transform: none; font-size: 11px; border: none; }
+  .sub { font-size: 13px; color: var(--ink-2); line-height: 1.6; margin-top: 10px; }
+  .sub b { color: var(--ink); font-weight: 600; }
+  .sub .muted { color: var(--faint); }
+
   /* today strip */
-  .today { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 2px; margin-bottom: 14px; overflow: hidden; }
-  .cell { background: var(--panel); padding: 12px 13px 13px; position: relative; }
-  .cell .ck { font-family: var(--mono); font-size: 9px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--dim); }
-  .cell .cv { font-size: 25px; font-weight: 500; margin-top: 7px; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
-  .cell .cz { font-family: var(--mono); font-size: 10px; margin-top: 4px; letter-spacing: 0.02em; }
+  .today { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 2px; margin-bottom: 16px; overflow: hidden; }
+  .cell { background: var(--panel); padding: 13px 14px 14px; }
+  .cell .ck { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
+  .cell .cv { font-size: 27px; font-weight: 600; margin-top: 8px; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; color: var(--ink); line-height: 1; }
+  .cell .cu { font-family: var(--mono); font-size: 10px; color: var(--faint); margin-left: 4px; font-weight: 400; }
+  .cell .cz { font-family: var(--mono); font-size: 11px; margin-top: 6px; letter-spacing: 0.01em; }
   .z-hi { color: var(--green); } .z-lo { color: var(--red); } .z-mid { color: var(--faint); }
-  @media (max-width: 900px) { .today { grid-template-columns: repeat(4, 1fr); } }
 
   /* grid */
   .grid { display: grid; gap: 14px; grid-template-columns: repeat(12, 1fr); }
-  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 2px; padding: 18px 20px; position: relative; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 2px; padding: 18px 20px; }
   .col-3 { grid-column: span 3; } .col-4 { grid-column: span 4; } .col-5 { grid-column: span 5; }
   .col-6 { grid-column: span 6; } .col-7 { grid-column: span 7; } .col-8 { grid-column: span 8; } .col-12 { grid-column: span 12; }
-  @media (max-width: 900px) { [class^="col-"] { grid-column: span 12; } }
+  @media (max-width: 900px) { [class^="col-"] { grid-column: span 12; } .today { grid-auto-flow: row; grid-template-columns: repeat(2,1fr); grid-auto-columns: unset; } }
 
-  .label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.17em; text-transform: uppercase; color: var(--dim); display: flex; justify-content: space-between; align-items: baseline; }
-  .label .hint { color: var(--ghost); letter-spacing: 0.04em; text-transform: none; font-size: 10px; }
-  .sub { font-size: 12px; color: var(--faint); line-height: 1.6; margin-top: 8px; }
-  .sub b { color: var(--dim); font-weight: 500; }
-
-  .hero-num { font-size: 58px; font-weight: 600; line-height: 1; color: var(--green); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; margin-top: 14px; }
-  .hero-num .unit { font-size: 15px; color: var(--faint); font-weight: 400; margin-left: 8px; letter-spacing: 0; }
+  /* hero number block — number + unit caption stacked, unmistakable */
+  .hero { margin-top: 16px; }
+  .hero .n { font-size: 60px; font-weight: 700; line-height: 0.9; color: var(--green); font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
+  .hero .u { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); margin-top: 9px; }
 
   /* agreement bars */
-  .bars { display: flex; flex-direction: column; gap: 13px; margin-top: 18px; }
-  .bar-row { display: grid; grid-template-columns: 88px 1fr 40px; align-items: center; gap: 12px; }
-  .bar-row .k { font-family: var(--mono); font-size: 10px; color: var(--dim); letter-spacing: 0.06em; text-transform: uppercase; }
-  .track { height: 3px; background: var(--bg); border-radius: 0; overflow: hidden; }
-  .fill { height: 100%; width: 0; background: var(--green); transition: width 1s cubic-bezier(.2,.8,.2,1); }
-  .bar-row .v { text-align: right; font-family: var(--mono); font-size: 12px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .bars { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+  .bar-row { display: grid; grid-template-columns: 92px 1fr 42px; align-items: center; gap: 12px; }
+  .bar-row .k { font-family: var(--mono); font-size: 11px; color: var(--dim); letter-spacing: 0.04em; text-transform: uppercase; }
+  .track { height: 4px; background: var(--bg-2); border-radius: 2px; overflow: hidden; }
+  .fill { height: 100%; width: 0; background: var(--green); transition: width .6s cubic-bezier(.2,.8,.2,1); }
+  .bar-row .v { text-align: right; font-family: var(--mono); font-size: 13px; color: var(--ink); font-variant-numeric: tabular-nums; }
 
   /* drivers */
-  .drivers { margin-top: 14px; display: flex; flex-direction: column; gap: 2px; }
-  .drv { display: grid; grid-template-columns: 130px 1fr 44px; align-items: center; gap: 10px; padding: 5px 0; }
-  .drv .dk { font-size: 12px; color: var(--ink); }
-  .drv .dbar { height: 18px; position: relative; background: var(--bg); }
-  .drv .dbar .mid { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--line-2); }
-  .drv .dseg { position: absolute; top: 3px; bottom: 3px; }
-  .drv .dseg.pos { left: 50%; background: linear-gradient(90deg, var(--green-soft), var(--green)); }
-  .drv .dseg.neg { right: 50%; background: linear-gradient(90deg, var(--red), #b8472f); }
-  .drv .dv { text-align: right; font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .drivers { margin-top: 16px; display: flex; flex-direction: column; gap: 3px; }
+  .drv { display: grid; grid-template-columns: 132px 1fr 46px; align-items: center; gap: 10px; padding: 5px 0; }
+  .drv .dk { font-size: 13px; color: var(--ink-2); }
+  .drv .dbar { height: 16px; position: relative; background: var(--bg-2); border-radius: 2px; }
+  .drv .dbar .mid { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--line-2); }
+  .drv .dseg { position: absolute; top: 3px; bottom: 3px; border-radius: 1px; transition: width .5s ease; }
+  .drv .dseg.pos { left: 50%; background: var(--green); }
+  .drv .dseg.neg { right: 50%; background: var(--red); }
+  .drv .dv { text-align: right; font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
   .drv .dv.pos { color: var(--green); } .drv .dv.neg { color: var(--red); }
 
   /* delta items */
-  .delta { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 16px; }
-  .delta .dk { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); }
-  .delta .dv { font-size: 28px; font-weight: 500; font-variant-numeric: tabular-nums; margin-top: 6px; letter-spacing: -0.01em; }
-  .delta .was { font-family: var(--mono); font-size: 10px; color: var(--faint); margin-top: 3px; }
-  .up { color: var(--green); } .down { color: var(--red); } .flat { color: var(--dim); }
+  .delta { display: flex; gap: 30px; flex-wrap: wrap; margin-top: 18px; }
+  .delta .dk { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
+  .delta .dv { font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 7px; letter-spacing: -0.02em; color: var(--ink); }
+  .delta .dv .arr { font-size: 16px; }
+  .delta .was { font-family: var(--mono); font-size: 11px; color: var(--faint); margin-top: 4px; }
+  .up { color: var(--green) !important; } .down { color: var(--red) !important; } .flat { color: var(--dim) !important; }
 
   /* chart */
   canvas { display: block; width: 100%; cursor: crosshair; }
-  .legend { display: flex; gap: 16px; font-family: var(--mono); font-size: 10px; color: var(--dim); margin-top: 10px; align-items: center; }
-  .legend .dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; vertical-align: middle; }
-  .legend .muted { color: var(--ghost); margin-left: auto; letter-spacing: 0.02em; }
-  .tip { position: fixed; pointer-events: none; background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 2px; padding: 8px 10px; font-family: var(--mono); font-size: 10px; color: var(--ink); z-index: 100; opacity: 0; transition: opacity .1s; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,.5); }
-  .tip .tr { display: flex; justify-content: space-between; gap: 16px; }
+  .legend { display: flex; gap: 18px; font-family: var(--mono); font-size: 11px; color: var(--dim); margin-top: 12px; align-items: center; }
+  .legend .dot { display: inline-block; width: 9px; height: 9px; margin-right: 7px; vertical-align: middle; border-radius: 2px; }
+  .legend .muted { color: var(--faint); margin-left: auto; letter-spacing: 0.02em; }
+  .tip { position: fixed; pointer-events: none; background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 2px; padding: 9px 11px; font-family: var(--mono); font-size: 11px; color: var(--ink); z-index: 100; opacity: 0; transition: opacity .1s; white-space: nowrap; box-shadow: 0 8px 28px rgba(0,0,0,.6); }
+  .tip .tr { display: flex; justify-content: space-between; gap: 18px; margin-top: 3px; }
   .tip .td { color: var(--dim); }
 
   /* table */
-  .scroll { max-height: 380px; overflow-y: auto; margin-top: 12px; }
-  .scroll::-webkit-scrollbar { width: 8px; } .scroll::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 0; }
-  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; }
-  th, td { text-align: right; padding: 6px 9px; white-space: nowrap; border-bottom: 1px solid var(--bg); }
-  th { color: var(--dim); font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; font-size: 9px; position: sticky; top: 0; background: var(--panel); border-bottom: 1px solid var(--line); }
+  .scroll { max-height: 380px; overflow-y: auto; margin-top: 14px; }
+  .scroll::-webkit-scrollbar { width: 9px; } .scroll::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 0; } .scroll::-webkit-scrollbar-track { background: var(--bg-2); }
+  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 7px 10px; white-space: nowrap; border-bottom: 1px solid var(--bg-2); }
+  th { color: var(--dim); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; font-size: 10px; position: sticky; top: 0; background: var(--panel); border-bottom: 1px solid var(--line); }
+  td { color: var(--ink-2); }
   tbody tr:hover td { background: var(--bg-2); }
   td:first-child, th:first-child { text-align: left; color: var(--dim); }
   .w { color: var(--blue); } .e { color: var(--green); }
-  .tag { font-size: 8px; border: 1px solid var(--line-2); padding: 1px 4px; letter-spacing: 0.08em; border-radius: 1px; }
-  .loading { font-family: var(--mono); color: var(--faint); font-size: 12px; letter-spacing: 0.12em; padding: 40px 0; }
+  .tag { font-size: 9px; border: 1px solid var(--line-2); padding: 1px 5px; letter-spacing: 0.06em; border-radius: 2px; color: var(--dim); }
+  .loading { font-family: var(--mono); color: var(--dim); font-size: 13px; letter-spacing: 0.1em; padding: 50px 0; }
+  /* subtle flash when a value changes on poll */
+  @keyframes vchg { from { color: var(--green); } to {} }
+  .changed { animation: vchg 1.2s ease-out; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="brand">whoop<span class="x">×</span>eight sleep <b>· fused</b></div>
-    <div class="hdr-r"><span id="stamp">—</span><button id="refresh">re-pull</button></div>
+    <div class="brand">whoop<span class="x">×</span>eight sleep <span class="tag">· fused</span></div>
+    <div class="hdr-r">
+      <span class="live"><span class="pip"></span>live · 10s</span>
+      <span id="stamp">—</span>
+      <button id="refresh">re-pull</button>
+    </div>
   </header>
   <div id="root"><div class="loading">acquiring signal…</div></div>
 </div>
@@ -131,52 +149,86 @@
 const $ = (s,p=document)=>p.querySelector(s);
 const fmt=(v,d=1)=>v==null?"—":(+v).toFixed(d);
 const tip = $("#tip");
+let built = false;     // skeleton built?
+let lastVals = {};     // for change-flash
 
-async function load(refresh=false){
-  $("#root").innerHTML = `<div class="loading">${refresh?"re-pulling both sources… (~30s)":"acquiring signal…"}</div>`;
+// ---- value setter: writes text into a stable node, flashes on change -------
+function setv(id, val){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const s = String(val);
+  if(el.textContent !== s){
+    el.textContent = s;
+    if(built && lastVals[id]!==undefined && lastVals[id]!==s){
+      el.classList.remove("changed"); void el.offsetWidth; el.classList.add("changed");
+    }
+    lastVals[id]=s;
+  }
+}
+function setw(id, pct){ const el=document.getElementById(id); if(el) el.style.width=pct+"%"; }
+
+async function fetchData(refresh=false){
   const r = await fetch("/api/summary"+(refresh?"?refresh=1":""));
-  render(await r.json());
+  return r.json();
 }
 
-function render(data){
-  const {nights, trust, comeback, drivers, today} = data;
-  $("#stamp").textContent = new Date(data.pulled_at*1000).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-  const c = comeback, base = c.baseline_eightsleep_avg, recent = c.recent7_eightsleep_avg;
+async function boot(){
+  const data = await fetchData(false);
+  buildSkeleton(data);
+  built = true;
+  update(data);
+  // poll every 10s, update in place
+  setInterval(async ()=>{ try{ update(await fetchData(false)); }catch(e){} }, 10000);
+}
+
+// ============ SKELETON (built once) =========================================
+function buildSkeleton(data){
+  const {nights, drivers, today} = data;
+  const todayKeys = today&&today.metrics ? Object.entries({
+    sleep_score:["score",""], hrv:["hrv",""], resting_hr:["rest hr","bpm"],
+    respiratory:["resp","rpm"], sleep_hours:["sleep","h"], deep_pct:["deep","%"], rem_pct:["rem","%"]
+  }).filter(([k])=>today.metrics[k]&&today.metrics[k].latest!=null) : [];
 
   $("#root").innerHTML = `
-    ${today && today.metrics ? todayStrip(today) : ""}
+    <div class="today">
+      ${todayKeys.map(([k,[lbl,unit]])=>`
+        <div class="cell">
+          <div class="ck">${lbl}</div>
+          <div class="cv"><span id="t_${k}">—</span><span class="cu">${unit}</span></div>
+          <div class="cz" id="tz_${k}">—</div>
+        </div>`).join("")}
+    </div>
+
     <div class="grid">
       <div class="panel col-5">
         <div class="label"><span>device agreement</span><span class="hint">two sensors · one body</span></div>
-        <div class="hero-num"><span id="agree">0</span><span class="unit">/ 100</span></div>
-        <div class="sub">${trust.overlapping_nights} nights with both on. Trend correlation across independent hardware — they tell the same story.</div>
+        <div class="hero"><div class="n" id="agree">—</div><div class="u">agreement index · 0–100</div></div>
+        <div class="sub" id="agree_sub">—</div>
         <div class="bars">
-          ${barRow("HRV", trust.correlations.hrv)}
-          ${barRow("resting HR", trust.correlations.resting_hr)}
-          ${barRow("respiratory", trust.correlations.respiratory)}
+          ${["hrv","resting_hr","respiratory"].map(k=>`
+            <div class="bar-row"><span class="k">${k.replace("_"," ")}</span><span class="track"><span class="fill" id="bar_${k}"></span></span><span class="v" id="barv_${k}">—</span></div>`).join("")}
         </div>
       </div>
 
       <div class="panel col-7">
         <div class="label"><span>the comeback</span><span class="hint">eight sleep covered the gap</span></div>
-        ${c.gap?`<div class="sub">WHOOP last worn <b>${c.gap.last_worn_before}</b> · <span style="color:var(--amber)">${c.gap.days} days ago</span>. The mattress kept logging every night since.</div>`:""}
+        <div class="sub" id="comeback_sub">—</div>
         <div class="delta">
-          ${deltaItem("sleep score", base.sleep_score, recent.sleep_score, 0, true)}
-          ${deltaItem("hrv", base.hrv, recent.hrv, 1, true)}
-          ${deltaItem("resting hr", base.hr, recent.hr, 1, false)}
+          ${[["sleep score","ss"],["hrv","hv"],["resting hr","rh"]].map(([lbl,id])=>`
+            <div><div class="dk">${lbl}</div><div class="dv" id="cb_${id}">—</div><div class="was" id="cbw_${id}">—</div></div>`).join("")}
         </div>
       </div>
 
       <div class="panel col-7">
-        <div class="label"><span>what drives your sleep</span><span class="hint">correlation across ${drivers.n} nights</span></div>
-        <div class="drivers">${drivers.sleep_score_drivers.map(driverRow).join("")}</div>
-        <div class="sub">${driverNarrative(drivers.sleep_score_drivers, "sleep score")}</div>
+        <div class="label"><span>what drives your sleep score</span><span class="hint" id="drv_n">—</span></div>
+        <div class="drivers" id="drv_sleep">${driverSkeleton(5)}</div>
+        <div class="sub" id="drv_sleep_sub">—</div>
       </div>
 
       <div class="panel col-5">
         <div class="label"><span>what drives your hrv</span><span class="hint">recovery's leading signal</span></div>
-        <div class="drivers">${drivers.hrv_drivers.slice(0,4).map(driverRow).join("")}</div>
-        <div class="sub">${driverNarrative(drivers.hrv_drivers, "HRV")}</div>
+        <div class="drivers" id="drv_hrv">${driverSkeleton(4)}</div>
+        <div class="sub" id="drv_hrv_sub">—</div>
       </div>
 
       <div class="panel col-8">
@@ -185,70 +237,144 @@ function render(data){
         <div class="legend">
           <span><span class="dot" style="background:var(--blue)"></span>WHOOP</span>
           <span><span class="dot" style="background:var(--green)"></span>Eight Sleep</span>
-          <span class="muted">hover for any night</span>
+          <span class="muted">hover any night</span>
         </div>
       </div>
 
       <div class="panel col-4">
         <div class="label"><span>coverage</span></div>
-        <div style="display:flex;gap:22px;margin:14px 0 4px">
-          <div><div class="hero-num" style="font-size:30px;color:var(--blue);margin-top:0">${c.whoop_active_nights}</div><div class="sub" style="margin-top:2px">WHOOP nights</div></div>
-          <div><div class="hero-num" style="font-size:30px;color:var(--green);margin-top:0">${c.eightsleep_only_nights}</div><div class="sub" style="margin-top:2px">ES-only nights</div></div>
+        <div style="display:flex;gap:26px;margin:16px 0 6px">
+          <div><div class="n" style="font-size:34px;font-weight:700;color:var(--blue);line-height:1" id="cov_w">—</div><div class="u" style="margin-top:7px">WHOOP nights</div></div>
+          <div><div class="n" style="font-size:34px;font-weight:700;color:var(--green);line-height:1" id="cov_e">—</div><div class="u" style="margin-top:7px">eight sleep nights</div></div>
         </div>
-        <canvas id="scoreChart" height="96"></canvas>
-        <div class="sub">Eight Sleep sleep score — the line never breaks across the gap.</div>
+        <canvas id="scoreChart" height="92"></canvas>
+        <div class="sub muted" style="font-size:12px">sleep score over time — unbroken across the gap.</div>
       </div>
 
       <div class="panel col-12">
-        <div class="label"><span>nightly log</span><span class="hint">${nights.length} nights</span></div>
+        <div class="label"><span>nightly log</span><span class="hint" id="log_n">—</span></div>
         <div class="scroll"><table>
           <thead><tr>
-            <th>night</th><th>rec</th><th>strain</th><th class="w">W·hrv</th><th class="w">W·rhr</th><th class="w">deep%</th>
-            <th class="e">E·score</th><th class="e">E·hrv</th><th class="e">E·hr</th><th class="e">deep%</th><th class="e">rem%</th><th class="e">sleep</th><th>src</th>
+            <th>night</th><th>rec</th><th>strain</th><th class="w">W hrv</th><th class="w">W rhr</th><th class="w">deep</th>
+            <th class="e">E score</th><th class="e">E hrv</th><th class="e">E hr</th><th class="e">deep</th><th class="e">rem</th><th class="e">sleep</th><th>src</th>
           </tr></thead>
-          <tbody>${nights.slice().reverse().map(rowHtml).join("")}</tbody>
+          <tbody id="log_body"></tbody>
         </table></div>
       </div>
     </div>`;
 
-  countUp("#agree", Math.round((trust.overall_agreement||0)*100));
-  requestAnimationFrame(()=>document.querySelectorAll(".fill").forEach(f=>f.style.width=f.dataset.w+"%"));
+  $("#refresh").addEventListener("click", async ()=>{
+    $("#refresh").textContent="pulling…";
+    update(await fetchData(true));
+    $("#refresh").textContent="re-pull";
+  });
+}
+function driverSkeleton(n){
+  let s="";for(let i=0;i<n;i++) s+=`<div class="drv" id="drvrow_${i}" style="display:none"><span class="dk"></span><span class="dbar"><span class="mid"></span><span class="dseg"></span></span><span class="dv"></span></div>`;
+  return s;
+}
+
+// ============ UPDATE (in place, no reflow) ==================================
+function update(data){
+  const {nights, trust, comeback, drivers, today} = data;
+  setv("stamp", new Date(data.pulled_at*1000).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}));
+
+  // today strip
+  if(today&&today.metrics){
+    const dmap={sleep_score:0,hrv:1,resting_hr:0,respiratory:1,sleep_hours:1,deep_pct:0,rem_pct:0};
+    for(const [k,m] of Object.entries(today.metrics)){
+      if(document.getElementById("t_"+k)){
+        setv("t_"+k, fmt(m.latest, dmap[k]??1));
+        const zel=document.getElementById("tz_"+k);
+        if(zel){
+          const z=m.z; let cls="z-mid", arrow="·", txt="baseline";
+          if(z!=null&&Math.abs(z)>=0.5){const good=m.higher_good?z>0:z<0;cls=good?"z-hi":"z-lo";arrow=z>0?"▲":"▼";txt=`${z>0?"+":""}${z}σ`;}
+          else if(z!=null){txt=`${z>0?"+":""}${z}σ`;}
+          zel.className="cz "+cls; zel.textContent=`${arrow} ${txt} vs 30d`;
+        }
+      }
+    }
+  }
+
+  // agreement
+  const ag=Math.round((trust.overall_agreement||0)*100);
+  setv("agree", ag);
+  setv("agree_sub_x", ""); // noop guard
+  $("#agree_sub").innerHTML = `<b>${trust.overlapping_nights} nights</b> with both devices on. Trend correlation across independent hardware — when they agree, you can trust the number.`;
+  for(const k of ["hrv","resting_hr","respiratory"]){
+    const c=trust.correlations[k];
+    setw("bar_"+k, c==null?0:Math.round(c*100));
+    setv("barv_"+k, c==null?"—":c.toFixed(2));
+  }
+
+  // comeback
+  const c=comeback, base=c.baseline_eightsleep_avg, rec=c.recent7_eightsleep_avg;
+  $("#comeback_sub").innerHTML = c.gap
+    ? `WHOOP last worn <b>${c.gap.last_worn_before}</b> <span class="muted">·</span> <span style="color:var(--amber)">${c.gap.days} days ago</span>. The mattress logged every night since — here's then vs now.`
+    : "Both devices active.";
+  setDelta("ss", base.sleep_score, rec.sleep_score, 0, true);
+  setDelta("hv", base.hrv, rec.hrv, 1, true);
+  setDelta("rh", base.hr, rec.hr, 1, false);
+
+  // drivers
+  setv("drv_n", `across ${drivers.n} nights`);
+  fillDrivers("drv_sleep", drivers.sleep_score_drivers, 5);
+  fillDrivers("drv_hrv", drivers.hrv_drivers, 4);
+  $("#drv_sleep_sub").innerHTML = driverNarr(drivers.sleep_score_drivers, "sleep score");
+  $("#drv_hrv_sub").innerHTML = driverNarr(drivers.hrv_drivers, "HRV");
+
+  // coverage
+  setv("cov_w", c.whoop_active_nights);
+  setv("cov_e", c.eightsleep_only_nights);
+
+  // log
+  setv("log_n", `${nights.length} nights`);
+  const body=$("#log_body");
+  const html=nights.slice().reverse().map(rowHtml).join("");
+  if(body.innerHTML!==html) body.innerHTML=html;
+
   drawHrv(nights);
   drawScore(nights);
 }
 
-function todayStrip(t){
-  const m=t.metrics;
-  const order=[["sleep_score","score",0],["hrv","hrv",1],["resting_hr","rest hr",0],["respiratory","resp",1],["sleep_hours","sleep",1],["deep_pct","deep %",0],["rem_pct","rem %",0],["sleep_debt","debt",1]];
-  const cells=order.filter(([k])=>m[k]&&m[k].latest!=null).map(([k,lbl,d])=>{
-    const x=m[k]; const z=x.z;
-    let cls="z-mid", arrow="·";
-    if(z!=null&&Math.abs(z)>=0.5){ const good=x.higher_good?z>0:z<0; cls=good?"z-hi":"z-lo"; arrow=z>0?"▲":"▼"; }
-    const zt = z==null?"":`${arrow} ${z>0?"+":""}${z} σ`;
-    return `<div class="cell"><div class="ck">${lbl}</div><div class="cv">${fmt(x.latest,d)}</div><div class="cz ${cls}">${zt}</div></div>`;
-  }).join("");
-  return `<div class="today">${cells}</div>`;
+function setDelta(id, from, to, d, higherGood){
+  const el=document.getElementById("cb_"+id), wel=document.getElementById("cbw_"+id);
+  if(!el)return;
+  if(from==null||to==null){el.className="dv flat";el.textContent=fmt(to,d);wel.textContent="—";return;}
+  const diff=to-from, eps=d===0?0.5:0.05, flat=Math.abs(diff)<eps, up=diff>0, good=higherGood?up:!up;
+  el.className="dv "+(flat?"flat":good?"up":"down");
+  el.innerHTML=`${fmt(to,d)} <span class="arr">${flat?"→":up?"↑":"↓"}</span>`;
+  wel.textContent=`was ${fmt(from,d)}`;
 }
 
-function barRow(k,c){const p=c==null?0:Math.round(c*100);return `<div class="bar-row"><span class="k">${k}</span><span class="track"><span class="fill" data-w="${p}"></span></span><span class="v">${c==null?"—":c.toFixed(2)}</span></div>`;}
-
-function driverRow(d){
-  const mag=Math.min(100, Math.abs(d.r)*140);
-  const pos=d.r>=0;
-  return `<div class="drv"><span class="dk">${d.label}</span><span class="dbar"><span class="mid"></span><span class="dseg ${pos?'pos':'neg'}" style="width:${mag/2}%"></span></span><span class="dv ${pos?'pos':'neg'}">${pos?"+":""}${d.r.toFixed(2)}</span></div>`;
+function fillDrivers(containerId, list, max){
+  const cont=document.getElementById(containerId);
+  for(let i=0;i<max;i++){
+    const row=document.getElementById((containerId==="drv_sleep"?"drvrow_":"hdrvrow_")+i);
+  }
+  // re-render rows into the existing container nodes
+  const rows=cont.children;
+  for(let i=0;i<max;i++){
+    let row=rows[i];
+    const d=list[i];
+    if(!row){ continue; }
+    if(!d){ row.style.display="none"; continue; }
+    row.style.display="grid";
+    row.querySelector(".dk").textContent=d.label;
+    const seg=row.querySelector(".dseg");
+    const pos=d.r>=0, mag=Math.min(100,Math.abs(d.r)*140)/2;
+    seg.className="dseg "+(pos?"pos":"neg");
+    seg.style.width=mag+"%";
+    seg.style.left=pos?"50%":"auto"; seg.style.right=pos?"auto":"50%";
+    const dv=row.querySelector(".dv");
+    dv.className="dv "+(pos?"pos":"neg");
+    dv.textContent=(pos?"+":"")+d.r.toFixed(2);
+  }
 }
-function driverNarrative(ds, outcome){
-  if(!ds.length) return "";
-  const top=ds[0]; const dir=top.r>=0?"more":"less";
-  return `<b>${top.label}</b> is your strongest lever — ${dir} of it tracks higher ${outcome} (r ${top.r>=0?"+":""}${top.r.toFixed(2)}).`;
-}
-
-function deltaItem(k,from,to,d,higherGood){
-  if(from==null||to==null) return `<div><div class="dk">${k}</div><div class="dv flat">${fmt(to,d)}</div></div>`;
-  const diff=to-from, eps=d===0?0.5:0.05;
-  const flat=Math.abs(diff)<eps, up=diff>0, good=higherGood?up:!up;
-  const cls=flat?"flat":good?"up":"down", sym=flat?"→":up?"↑":"↓";
-  return `<div><div class="dk">${k}</div><div class="dv ${cls}">${fmt(to,d)} <span style="font-size:15px">${sym}</span></div><div class="was">was ${fmt(from,d)}</div></div>`;
+function driverNarr(ds, outcome){
+  if(!ds||!ds.length) return "";
+  const t=ds[0], dir=t.r>=0?"more":"less";
+  return `<b>${t.label}</b> is your strongest lever — ${dir} of it tracks higher ${outcome} <span class="muted">(r ${t.r>=0?"+":""}${t.r.toFixed(2)})</span>.`;
 }
 
 function rowHtml(n){
@@ -269,8 +395,7 @@ function rowHtml(n){
     <td>${tag}</td></tr>`;
 }
 
-function countUp(sel,target){const el=$(sel);if(!el)return;const t0=performance.now();function tk(t){const p=Math.min(1,(t-t0)/1000);el.textContent=Math.round(target*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(tk);}requestAnimationFrame(tk);}
-
+// ============ charts ========================================================
 function zscore(a){const v=a.filter(x=>x!=null);if(v.length<2)return a.map(()=>null);const mu=v.reduce((x,y)=>x+y,0)/v.length;const sd=Math.sqrt(v.reduce((x,y)=>x+(y-mu)**2,0)/v.length)||1;return a.map(x=>x==null?null:(x-mu)/sd);}
 
 let hrvState=null;
@@ -279,52 +404,48 @@ function drawHrv(nights){
   const dpr=devicePixelRatio||1, W=cv.clientWidth, H=230;
   cv.width=W*dpr;cv.height=H*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
   const w=zscore(nights.map(n=>n.whoop_hrv_ms)), e=zscore(nights.map(n=>n.es_hrv));
-  const pad={l:26,r:14,t:14,b:20}, iW=W-pad.l-pad.r, iH=H-pad.t-pad.b;
+  const pad={l:28,r:14,t:14,b:18}, iW=W-pad.l-pad.r, iH=H-pad.t-pad.b;
   const all=[...w,...e].filter(x=>x!=null), min=Math.min(-2.4,...all), max=Math.max(2.4,...all);
   const X=i=>pad.l+iW*i/Math.max(1,nights.length-1), Y=v=>pad.t+iH*(1-(v-min)/(max-min));
   hrvState={nights,w,e,X,Y,pad,W,H,iH};
   paintHrv(-1);
 }
 function paintHrv(hover){
-  const s=hrvState;if(!s)return;const cv=$("#hrvChart");const ctx=cv.getContext("2d");
+  const s=hrvState;if(!s)return;const ctx=$("#hrvChart").getContext("2d");
   ctx.clearRect(0,0,s.W,s.H);
-  ctx.font="9px 'JetBrains Mono',monospace";
-  // overlap band: where both sensors recorded HRV — the validation window
+  ctx.font="10px 'JetBrains Mono',monospace";
   const ov=s.nights.map((n,i)=>(n.whoop_hrv_ms!=null&&n.es_hrv!=null)?i:null).filter(i=>i!=null);
-  if(ov.length){const x0=s.X(Math.min(...ov)),x1=s.X(Math.max(...ov));ctx.fillStyle="rgba(91,141,239,0.07)";ctx.fillRect(x0,s.pad.t,Math.max(2,x1-x0),s.iH);ctx.fillStyle="#3a4a5e";ctx.fillText("overlap",x0+3,s.pad.t+10);}
-  for(let g=-2;g<=2;g++){const yy=s.Y(g);ctx.strokeStyle="#1b222b";ctx.globalAlpha=g===0?1:0.45;ctx.beginPath();ctx.moveTo(s.pad.l,yy);ctx.lineTo(s.W-s.pad.r,yy);ctx.stroke();ctx.globalAlpha=1;ctx.fillStyle="#4a5663";ctx.fillText((g>0?"+":"")+g,4,yy+3);}
-  const line=(vals,color)=>{ctx.strokeStyle=color;ctx.lineWidth=1.6;ctx.beginPath();let st=false;vals.forEach((v,i)=>{if(v==null){st=false;return;}const px=s.X(i),py=s.Y(v);if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);});ctx.stroke();};
-  line(s.e,"#00d892");line(s.w,"#5b8def");
-  if(hover>=0){const px=s.X(hover);ctx.strokeStyle="#2f3945";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(px,s.pad.t);ctx.lineTo(px,s.pad.t+s.iH);ctx.stroke();
-    [["#5b8def",s.w],["#00d892",s.e]].forEach(([c,v])=>{if(v[hover]!=null){ctx.fillStyle=c;ctx.beginPath();ctx.arc(px,s.Y(v[hover]),3,0,7);ctx.fill();}});
-  }
+  if(ov.length){const x0=s.X(Math.min(...ov)),x1=s.X(Math.max(...ov));ctx.fillStyle="rgba(110,160,255,0.08)";ctx.fillRect(x0,s.pad.t,Math.max(2,x1-x0),s.iH);ctx.fillStyle="#5a6b80";ctx.fillText("overlap",x0+4,s.pad.t+11);}
+  for(let g=-2;g<=2;g++){const yy=s.Y(g);ctx.strokeStyle="#232c37";ctx.globalAlpha=g===0?1:0.5;ctx.beginPath();ctx.moveTo(s.pad.l,yy);ctx.lineTo(s.W-s.pad.r,yy);ctx.stroke();ctx.globalAlpha=1;ctx.fillStyle="#6b7682";ctx.fillText((g>0?"+":"")+g,5,yy+3);}
+  const line=(vals,color)=>{ctx.strokeStyle=color;ctx.lineWidth=1.7;ctx.beginPath();let st=false;vals.forEach((v,i)=>{if(v==null){st=false;return;}const px=s.X(i),py=s.Y(v);if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);});ctx.stroke();};
+  line(s.e,"#1fe096");line(s.w,"#6ea0ff");
+  if(hover>=0){const px=s.X(hover);ctx.strokeStyle="#3a4654";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(px,s.pad.t);ctx.lineTo(px,s.pad.t+s.iH);ctx.stroke();[["#6ea0ff",s.w],["#1fe096",s.e]].forEach(([c,v])=>{if(v[hover]!=null){ctx.fillStyle=c;ctx.beginPath();ctx.arc(px,s.Y(v[hover]),3.2,0,7);ctx.fill();}});}
 }
 function hrvHover(ev){
-  const s=hrvState;if(!s)return;const cv=$("#hrvChart");const rect=cv.getBoundingClientRect();
+  const s=hrvState;if(!s)return;const rect=$("#hrvChart").getBoundingClientRect();
   const x=ev.clientX-rect.left;const i=Math.round((x-s.pad.l)/((s.W-s.pad.l-s.pad.r)/Math.max(1,s.nights.length-1)));
   if(i<0||i>=s.nights.length){tip.style.opacity=0;paintHrv(-1);return;}
   const n=s.nights[i];paintHrv(i);
-  tip.innerHTML=`<div style="color:var(--dim);margin-bottom:4px">${n.date}</div>
+  tip.innerHTML=`<div style="color:var(--ink);font-weight:500">${n.date}</div>
     <div class="tr"><span class="td">WHOOP hrv</span><span class="w">${fmt(n.whoop_hrv_ms,0)} ms</span></div>
     <div class="tr"><span class="td">ES hrv</span><span class="e">${fmt(n.es_hrv,1)}</span></div>
     <div class="tr"><span class="td">rec / score</span><span>${n.whoop_recovery==null?"—":Math.round(n.whoop_recovery)} / ${n.es_score??"—"}</span></div>`;
   tip.style.left=(ev.clientX+14)+"px";tip.style.top=(ev.clientY+14)+"px";tip.style.opacity=1;
 }
-document.addEventListener("mousemove",e=>{if(e.target&&e.target.id==="hrvChart")hrvHover(e);else if(tip.style.opacity!="0"){tip.style.opacity=0;paintHrv(-1);}});
+document.addEventListener("mousemove",e=>{if(e.target&&e.target.id==="hrvChart")hrvHover(e);else if(tip.style.opacity!=="0"){tip.style.opacity=0;paintHrv(-1);}});
 
 function drawScore(nights){
-  const cv=$("#scoreChart");if(!cv)return;const dpr=devicePixelRatio||1,W=cv.clientWidth,H=96;
+  const cv=$("#scoreChart");if(!cv)return;const dpr=devicePixelRatio||1,W=cv.clientWidth,H=92;
   cv.width=W*dpr;cv.height=H*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
   const pad={l:4,r:4,t:8,b:4},iW=W-pad.l-pad.r,iH=H-pad.t-pad.b;
   const X=i=>pad.l+iW*i/Math.max(1,nights.length-1),Y=v=>pad.t+iH*(1-(v-40)/60);
   const wIdx=nights.map((n,i)=>n.whoop_recovery!=null?i:null).filter(i=>i!=null);
-  if(wIdx.length){ctx.fillStyle="rgba(91,141,239,0.10)";const x0=X(Math.min(...wIdx)),x1=X(Math.max(...wIdx));ctx.fillRect(x0,pad.t,Math.max(2,x1-x0),iH);ctx.fillStyle="#5b8def";ctx.font="8px 'JetBrains Mono'";ctx.fillText("WHOOP era",x0+3,pad.t+9);}
-  ctx.beginPath();let st=false;nights.forEach((n,i)=>{if(n.es_score==null)return;const px=X(i),py=Y(n.es_score);if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);});ctx.strokeStyle="#00d892";ctx.lineWidth=1.3;ctx.stroke();
+  if(wIdx.length){ctx.fillStyle="rgba(110,160,255,0.10)";const x0=X(Math.min(...wIdx)),x1=X(Math.max(...wIdx));ctx.fillRect(x0,pad.t,Math.max(2,x1-x0),iH);ctx.fillStyle="#6ea0ff";ctx.font="9px 'JetBrains Mono'";ctx.fillText("WHOOP era",x0+3,pad.t+9);}
+  ctx.beginPath();let st=false;nights.forEach((n,i)=>{if(n.es_score==null)return;const px=X(i),py=Y(n.es_score);if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);});ctx.strokeStyle="#1fe096";ctx.lineWidth=1.4;ctx.stroke();
 }
 
-$("#refresh").addEventListener("click",()=>load(true));
-addEventListener("resize",()=>{if(hrvState)render.__last&&0;});
-load();
+addEventListener("resize",()=>{if(hrvState&&window.__lastData)drawHrv(window.__lastData.nights);});
+boot();
 </script>
 </body>
 </html>
