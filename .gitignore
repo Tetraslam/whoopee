@@ -36,3 +36,7 @@ dist/
 # Cached pulls of personal biometric data — never commit
 **/.cache/
 .cache/
+.run/
+
+# Playwright MCP run artifacts
+.playwright-mcp/

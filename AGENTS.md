@@ -82,6 +82,25 @@ tools/load-env.sh -- uv run python -m whoop.cli profile
 See `lib/py/whoop/README.md` for the full API. The redirect URL must be
 registered in the WHOOP dashboard as exactly `http://localhost:8765/callback`.
 
+Eight Sleep has no official API; `lib/py/eightsleep` vendors lukas-clarke's
+OAuth2 client and exposes tidy per-night records (`recent_nights`). It needs
+`EIGHT_SLEEP_EMAIL` / `_PASSWORD` / `_TIMEZONE` (see `.env.op`).
+
+## Long-running things — tools/serve.sh
+
+Don't launch a server in the foreground (it blocks the shell). Use the daemon
+manager — every subcommand returns immediately and works for humans and agents:
+
+```bash
+tools/serve.sh start dashboard      # background, secrets injected via load-env.sh
+tools/serve.sh status dashboard
+tools/serve.sh logs dashboard       # tail -40
+tools/serve.sh restart dashboard
+tools/serve.sh stop dashboard
+```
+
+Add a `run_cmd` case in `tools/serve.sh` when you add a new long-running project.
+
 ## House style
 
 - Python: ruff (`ruff check`, `ruff format`). Config in `pyproject.toml`.

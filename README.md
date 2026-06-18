@@ -7,9 +7,11 @@ at the root, a shared WHOOP client in `lib/`, experiments in `projects/`.
 ```
 whoopee/
 ├── lib/py/whoop/    # Python WHOOP v2 client (OAuth2 + paginated data pulls)
-├── lib/ts/whoop/    # TypeScript mirror of the client
+├── lib/py/eightsleep/  # Eight Sleep client (vendored OAuth2 pyeight)
+├── lib/ts/whoop/    # TypeScript mirror of the WHOOP client
 ├── projects/        # experiments — one dir per thing
-├── tools/load-env.sh
+│   └── dashboard/   # WHOOP × Eight Sleep fused dashboard
+├── tools/           # load-env.sh (secrets), serve.sh (daemons)
 ├── pyproject.toml   # uv workspace
 ├── pnpm-workspace.yaml
 └── .env.op          # op:// secret refs (committed, safe)
@@ -54,5 +56,17 @@ with WhoopClient.from_env() as client:
 
 Add a new experiment under `projects/`, depend on `whoop` (py) or
 `@whoopee/whoop` (ts), and go.
+
+## The fused dashboard
+
+The first real project: WHOOP and Eight Sleep, lined up night by night. Two
+independent sensors on the same sleep — they agree ~0.97 on HRV/HR/respiratory,
+and Eight Sleep silently covers any stretch you stop wearing WHOOP.
+
+```bash
+tools/serve.sh start dashboard   # http://127.0.0.1:8787
+```
+
+See [projects/dashboard/README.md](./projects/dashboard/README.md).
 
 _Built by claude._

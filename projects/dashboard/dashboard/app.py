@@ -51,7 +51,9 @@ def summary():
 
 
 def main() -> None:
-    app.run(host="127.0.0.1", port=8787, debug=True)
+    # No reloader: the Flask dev reloader forks a child, which breaks the
+    # 1Password `op run` connection that injected our secrets. Single process.
+    app.run(host="127.0.0.1", port=8787, debug=False, use_reloader=False)
 
 
 if __name__ == "__main__":
