@@ -103,6 +103,11 @@
   .delta .dv { font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 7px; letter-spacing: -0.02em; color: var(--ink); }
   .delta .dv .arr { font-size: 16px; }
   .delta .was { font-family: var(--mono); font-size: 11px; color: var(--faint); margin-top: 4px; }
+  .thennow { display: flex; align-items: baseline; gap: 8px; margin-top: 7px; }
+  .thennow .then { font-family: var(--mono); font-size: 15px; color: var(--faint); font-variant-numeric: tabular-nums; }
+  .thennow .ar { font-size: 15px; }
+  .thennow .dv { font-size: 30px; margin-top: 0; }
+  .thennow .u2 { font-family: var(--mono); font-size: 11px; color: var(--faint); }
   .up { color: var(--green) !important; } .down { color: var(--red) !important; } .flat { color: var(--dim) !important; }
 
   /* chart */
@@ -201,9 +206,8 @@ function buildSkeleton(data){
 
     <div class="grid">
       <div class="panel col-5">
-        <div class="label"><span>device agreement</span><span class="hint">two sensors · one body</span></div>
-        <div class="hero"><div class="n" id="agree">—</div><div class="u">agreement index · 0–100</div></div>
-        <div class="sub" id="agree_sub">—</div>
+        <div class="label"><span>device agreement</span><span class="hint">whoop hrv ↔ eight sleep hrv</span></div>
+        <canvas id="scatter" height="200"></canvas>
         <div class="bars">
           ${["hrv","resting_hr","respiratory"].map(k=>`
             <div class="bar-row"><span class="k">${k.replace("_"," ")}</span><span class="track"><span class="fill" id="bar_${k}"></span></span><span class="v" id="barv_${k}">—</span></div>`).join("")}
@@ -211,24 +215,25 @@ function buildSkeleton(data){
       </div>
 
       <div class="panel col-7">
-        <div class="label"><span>the comeback</span><span class="hint">eight sleep covered the gap</span></div>
-        <div class="sub" id="comeback_sub">—</div>
+        <div class="label"><span>the comeback</span><span class="hint" id="gap_hint">—</span></div>
         <div class="delta">
-          ${[["sleep score","ss"],["hrv","hv"],["resting hr","rh"]].map(([lbl,id])=>`
-            <div><div class="dk">${lbl}</div><div class="dv" id="cb_${id}">—</div><div class="was" id="cbw_${id}">—</div></div>`).join("")}
+          ${[["sleep score","ss",""],["hrv","hv",""],["resting hr","rh","bpm"]].map(([lbl,id,u])=>`
+            <div>
+              <div class="dk">${lbl}</div>
+              <div class="thennow"><span class="then" id="cbf_${id}">—</span><span class="ar" id="cba_${id}">→</span><span class="dv" id="cb_${id}">—</span><span class="u2">${u}</span></div>
+            </div>`).join("")}
         </div>
+        <canvas id="cbChart" height="120"></canvas>
       </div>
 
       <div class="panel col-7">
         <div class="label"><span>what drives your sleep score</span><span class="hint" id="drv_n">—</span></div>
         <div class="drivers" id="drv_sleep">${driverSkeleton(5)}</div>
-        <div class="sub" id="drv_sleep_sub">—</div>
       </div>
 
       <div class="panel col-5">
-        <div class="label"><span>what drives your hrv</span><span class="hint">recovery's leading signal</span></div>
+        <div class="label"><span>what drives your hrv</span><span class="hint">pearson r · all nights</span></div>
         <div class="drivers" id="drv_hrv">${driverSkeleton(4)}</div>
-        <div class="sub" id="drv_hrv_sub">—</div>
       </div>
 
       <div class="panel col-8">
@@ -248,7 +253,6 @@ function buildSkeleton(data){
           <div><div class="n" style="font-size:34px;font-weight:700;color:var(--green);line-height:1" id="cov_e">—</div><div class="u" style="margin-top:7px">eight sleep nights</div></div>
         </div>
         <canvas id="scoreChart" height="92"></canvas>
-        <div class="sub muted" style="font-size:12px">sleep score over time — unbroken across the gap.</div>
       </div>
 
       <div class="panel col-12">
@@ -296,32 +300,29 @@ function update(data){
     }
   }
 
-  // agreement
-  const ag=Math.round((trust.overall_agreement||0)*100);
-  setv("agree", ag);
-  setv("agree_sub_x", ""); // noop guard
-  $("#agree_sub").innerHTML = `<b>${trust.overlapping_nights} nights</b> with both devices on. Trend correlation across independent hardware — when they agree, you can trust the number.`;
+  // agreement — the scatter shows the correlation; bars quantify per metric
   for(const k of ["hrv","resting_hr","respiratory"]){
     const c=trust.correlations[k];
-    setw("bar_"+k, c==null?0:Math.round(c*100));
+    setw("bar_"+k, c==null?0:Math.round(Math.abs(c)*100));
     setv("barv_"+k, c==null?"—":c.toFixed(2));
   }
+  drawScatter(nights);
 
-  // comeback
+  // comeback — then → now, shown
   const c=comeback, base=c.baseline_eightsleep_avg, rec=c.recent7_eightsleep_avg;
-  $("#comeback_sub").innerHTML = c.gap
-    ? `WHOOP last worn <b>${c.gap.last_worn_before}</b> <span class="muted">·</span> <span style="color:var(--amber)">${c.gap.days} days ago</span>. The mattress logged every night since — here's then vs now.`
-    : "Both devices active.";
-  setDelta("ss", base.sleep_score, rec.sleep_score, 0, true);
-  setDelta("hv", base.hrv, rec.hrv, 1, true);
-  setDelta("rh", base.hr, rec.hr, 1, false);
+  if(c.gap){
+    const h=document.getElementById("gap_hint");
+    h.innerHTML = `worn through ${c.gap.last_worn_before} · <span style="color:var(--amber)">${c.gap.days}d dark</span>`;
+  }
+  setThenNow("ss", base.sleep_score, rec.sleep_score, 0, true);
+  setThenNow("hv", base.hrv, rec.hrv, 1, true);
+  setThenNow("rh", base.hr, rec.hr, 1, false);
+  drawComeback(nights);
 
-  // drivers
-  setv("drv_n", `across ${drivers.n} nights`);
+  // drivers — ranked bars say it; no sentence
+  setv("drv_n", `pearson r · ${drivers.n} nights`);
   fillDrivers("drv_sleep", drivers.sleep_score_drivers, 5);
   fillDrivers("drv_hrv", drivers.hrv_drivers, 4);
-  $("#drv_sleep_sub").innerHTML = driverNarr(drivers.sleep_score_drivers, "sleep score");
-  $("#drv_hrv_sub").innerHTML = driverNarr(drivers.hrv_drivers, "HRV");
 
   // coverage
   setv("cov_w", c.whoop_active_nights);
@@ -337,14 +338,16 @@ function update(data){
   drawScore(nights);
 }
 
-function setDelta(id, from, to, d, higherGood){
-  const el=document.getElementById("cb_"+id), wel=document.getElementById("cbw_"+id);
-  if(!el)return;
-  if(from==null||to==null){el.className="dv flat";el.textContent=fmt(to,d);wel.textContent="—";return;}
+function setThenNow(id, from, to, d, higherGood){
+  const fEl=document.getElementById("cbf_"+id), aEl=document.getElementById("cba_"+id), nEl=document.getElementById("cb_"+id);
+  if(!nEl)return;
+  fEl.textContent = from==null?"—":(+from).toFixed(d);
+  nEl.textContent = to==null?"—":(+to).toFixed(d);
+  if(from==null||to==null){nEl.className="dv flat";aEl.textContent="→";aEl.className="ar flat";return;}
   const diff=to-from, eps=d===0?0.5:0.05, flat=Math.abs(diff)<eps, up=diff>0, good=higherGood?up:!up;
-  el.className="dv "+(flat?"flat":good?"up":"down");
-  el.innerHTML=`${fmt(to,d)} <span class="arr">${flat?"→":up?"↑":"↓"}</span>`;
-  wel.textContent=`was ${fmt(from,d)}`;
+  const cls=flat?"flat":good?"up":"down";
+  nEl.className="dv "+cls; aEl.className="ar "+cls;
+  aEl.textContent=flat?"→":up?"↗":"↘";
 }
 
 function fillDrivers(containerId, list, max){
@@ -375,6 +378,54 @@ function driverNarr(ds, outcome){
   if(!ds||!ds.length) return "";
   const t=ds[0], dir=t.r>=0?"more":"less";
   return `<b>${t.label}</b> is your strongest lever — ${dir} of it tracks higher ${outcome} <span class="muted">(r ${t.r>=0?"+":""}${t.r.toFixed(2)})</span>.`;
+}
+
+// scatter: WHOOP HRV vs Eight Sleep HRV on overlap nights — correlation, shown
+function drawScatter(nights){
+  const cv=$("#scatter");if(!cv)return;const dpr=devicePixelRatio||1,W=cv.clientWidth,H=200;
+  cv.width=W*dpr;cv.height=H*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+  const pts=nights.filter(n=>n.whoop_hrv_ms!=null&&n.es_hrv!=null).map(n=>[n.es_hrv,n.whoop_hrv_ms]);
+  const pad={l:34,r:10,t:10,b:24};const iW=W-pad.l-pad.r,iH=H-pad.t-pad.b;
+  ctx.clearRect(0,0,W,H);
+  if(pts.length<2){ctx.fillStyle="#6b7682";ctx.font="11px 'JetBrains Mono'";ctx.fillText("not enough overlap yet",pad.l,H/2);return;}
+  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
+  const xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys);
+  const px=v=>pad.l+iW*(v-xmin)/((xmax-xmin)||1), py=v=>pad.t+iH*(1-(v-ymin)/((ymax-ymin)||1));
+  // axes
+  ctx.strokeStyle="#232c37";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,pad.t+iH);ctx.lineTo(pad.l+iW,pad.t+iH);ctx.stroke();
+  ctx.fillStyle="#6b7682";ctx.font="9px 'JetBrains Mono'";
+  ctx.fillText("ES",pad.l+iW-14,pad.t+iH+16);ctx.save();ctx.translate(10,pad.t+14);ctx.rotate(-Math.PI/2);ctx.fillText("WHOOP",0,0);ctx.restore();
+  // regression line
+  const n=pts.length,mx=xs.reduce((a,b)=>a+b)/n,my=ys.reduce((a,b)=>a+b)/n;
+  let num=0,den=0;for(let i=0;i<n;i++){num+=(xs[i]-mx)*(ys[i]-my);den+=(xs[i]-mx)**2;}
+  const slope=den?num/den:0,inter=my-slope*mx;
+  ctx.strokeStyle="rgba(110,160,255,0.5)";ctx.lineWidth=1.4;ctx.setLineDash([4,4]);ctx.beginPath();
+  ctx.moveTo(px(xmin),py(slope*xmin+inter));ctx.lineTo(px(xmax),py(slope*xmax+inter));ctx.stroke();ctx.setLineDash([]);
+  // points
+  pts.forEach(p=>{ctx.fillStyle="rgba(31,224,150,0.85)";ctx.beginPath();ctx.arc(px(p[0]),py(p[1]),3,0,7);ctx.fill();});
+  // r value, big, in corner
+  ctx.fillStyle="#1fe096";ctx.font="600 22px Inter,sans-serif";ctx.fillText("r "+(num/Math.sqrt(den*ys.reduce((a,b)=>a+(b-my)**2,0))).toFixed(2),pad.l+8,pad.t+22);
+  ctx.fillStyle="#94a1ad";ctx.font="10px 'JetBrains Mono'";ctx.fillText(pts.length+" overlap nights",pad.l+8,pad.t+38);
+}
+
+// comeback: the gap made visceral — score line with the dark window shaded amber
+function drawComeback(nights){
+  const cv=$("#cbChart");if(!cv)return;const dpr=devicePixelRatio||1,W=cv.clientWidth,H=120;
+  cv.width=W*dpr;cv.height=H*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+  const pad={l:4,r:4,t:10,b:4},iW=W-pad.l-pad.r,iH=H-pad.t-pad.b;
+  const X=i=>pad.l+iW*i/Math.max(1,nights.length-1),Y=v=>pad.t+iH*(1-(v-40)/60);
+  ctx.clearRect(0,0,W,H);
+  // WHOOP era (had recovery) in blue; the dark stretch after, amber wash
+  const wIdx=nights.map((n,i)=>n.whoop_recovery!=null?i:null).filter(i=>i!=null);
+  if(wIdx.length){
+    const lastW=Math.max(...wIdx);
+    ctx.fillStyle="rgba(110,160,255,0.10)";ctx.fillRect(X(Math.min(...wIdx)),pad.t,Math.max(2,X(lastW)-X(Math.min(...wIdx))),iH);
+    ctx.fillStyle="rgba(240,187,68,0.07)";ctx.fillRect(X(lastW),pad.t,X(nights.length-1)-X(lastW),iH);
+    ctx.fillStyle="#6ea0ff";ctx.font="9px 'JetBrains Mono'";ctx.fillText("worn",X(Math.min(...wIdx))+3,pad.t+9);
+    ctx.fillStyle="#f0bb44";ctx.fillText("dark",X(lastW)+3,pad.t+9);
+  }
+  ctx.beginPath();let st=false;nights.forEach((n,i)=>{if(n.es_score==null)return;const p=[X(i),Y(n.es_score)];if(!st){ctx.moveTo(...p);st=true;}else ctx.lineTo(...p);});
+  ctx.strokeStyle="#1fe096";ctx.lineWidth=1.3;ctx.stroke();
 }
 
 function rowHtml(n){
